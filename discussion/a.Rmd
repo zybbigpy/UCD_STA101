@@ -1,0 +1,25 @@
+---
+title: "Dis1"
+author: "Wangqian Miao"
+date: "2018Äê4ÔÂ4ÈÕ"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prob1
+```{r}
+library(ggplot2)
+mydata = read.csv("D:\\UCD_STA101\\discussion\\patients101.csv",header = TRUE, sep = ",")
+head(mydata)
+names(mydata)
+summary(mydata$sysBP)
+
+
+ggplot(mydata,aes(x=sysBP))+geom_histogram(binwidth = 4)
+
+```
+
+
