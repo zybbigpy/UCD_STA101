@@ -1,0 +1,320 @@
+
+---
+title: "CLASS STA101 - HW 1"
+author: "Wangqian Miao"
+output:
+  html_document:
+    fig_width: 5.5
+    fig_height: 4
+---
+
+### Problem 1
+**(a)**
+
+Firstly, I should know the head of the data.
+
+```{r, echo = FALSE}
+mydata=read.csv("poverty.csv",sep = ',',header = TRUE)
+head(mydata)
+library(ggplot2)
+qplot(PovPct,Brth15to17,data=mydata)+ggtitle("Birth15to17 vs PovPct")
+```
+
+From the scatter plot, it shows that there may be a linear relationship between "Brth15to17" and "PovPct".
+
+**(b)**
+
+```{r, echo = FALSE}
+cor(mydata$PovPct,mydata$Brth15to17)
+```
+
+The estimated correlation is `r cor(mydata$PovPct,mydata$Brth15to17)` which is near to 1. So, I think there is a strong linear relationship between "Brth15to17" and "PocPct".
+
+**(c)**
+
+The five STA number for "Brth15to17" is
+
+```{r, echo = FALSE}
+summary(mydata$PovPct)
+```
+
+**(d)**
+
+I can use boxplot to show whether there is any outliers in this data. So I know that there is an outlier in Brth15to17.
+
+```{r, echo = FALSE}
+ggplot(mydata,aes(y=Brth15to17,x = factor("")))+geom_boxplot()+ylab("Brth15to17") + xlab(" ")+ coord_flip() + ggtitle("Distribution of Brth15to17")
+```
+
+**(e)**
+
+The appropriate range $mean\pm3\sigma$. It is from `r mean(mydata$PovPct)-3*sd(mydata$PovPct)` to `r mean(mydata$PovPct)+3*sd(mydata$PovPct)`.
+
+### Problem 2
+**(a)**
+
+```{r, echo = FALSE}
+the.model=lm(Brth15to17~PovPct,data=mydata)
+the.betas = round(the.model$coefficients,4)
+the.model$coefficients
+```
+
+
+The linear regression function is $\hat{y}=4.2673+1.3733X_1$
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+
+The slope $\beta_1$ is `r the.betas[2]`. It means when "PocPct" adds one unit, the "Brth5to17" will add `r the.betas[2]` unit on average.
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+I think it is not appropricate. In my opinion if there are people, there will be people in poverty. So PovPct
+should not be 0.
+
+**(d)**
+```{r, echo = FALSE}
+xs=10
+ys=the.betas[1]+the.betas[2]*xs
+
+```
+
+The predict value of Brth15to17 for a state with poverty level 10% is `r ys`.
+
+**(e)**
+
+```{r,echo=FALSE}
+anova.table= anova(the.model)
+anova.table
+the.things = summary(the.model)
+R2 = the.things$r.squared
+```
+
+The value of $R^{2}$ is `r R2`. It means when we use the model of linear regression, we can reduce the error by 53.33% approximately than we use the average number to predict.  
+
+### Problem 3
+**(a)**
+```{r, echo = FALSE}
+rehab=read.csv("rehab.csv",sep = ',',header = TRUE)
+head(rehab)
+ggplot(rehab,aes(y = days,x =fitness)) + geom_boxplot() + ylab("days") + xlab("fitness") + ggtitle("days by fitness") + coord_flip()
+```
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+According to the boxplot, it shows that there is an outlier in the case of "BelowAve". 
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+Three $\beta's$ is needed.  
+$\beta_0$:the estimated number of days to complete the therapy in the case of "AboveAve" on average.  
+$\beta_1$:the estimated  difference of number of days to comlete the therapy between "Ave" and "AboveAve" on average.  
+$\beta_2$:the estimated difference of number of days to comlete the therapy between "BelowAve" and "Ave" on  average.
+
+**(d)**
+
+The Five STA number is below. 
+```{r, echo = FALSE}
+summary(rehab$days)
+```
+
+**(e)**
+
+I think outlier exists in the data when we use the boxplot by group. It is obvious when you refer to (a).
+
+### Problem 4
+**(a)**
+```{r, echo = FALSE} 
+the.model=lm(days~fitness,data=rehab)
+the.betas=round(the.model$coefficients,4)
+the.betas
+unique(rehab$fitness)
+```
+
+The regression line is $\hat{y}=21.4167+6.3333X_1+0.0833X_2$.
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+The days needed for a successful completion therapy tends to increase by 6.3333 ($\beta_1$) days on average when the fitness level is
+Ave instead of AboveAve. 
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+The days needed for a successful completion therapy tends to increase by 0.0833 ($\beta_2$) days on average when the fitness level is
+BelowAve instead of AboveAve. 
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+When the fitness level is AboveAve, it needs 21.4167($\beta_0$) days for a successful completion of therapy on average.
+
+**(e)**
+
+AboveAve: $\hat{y}=21.4167$  
+Ave: $\hat{y}=27.75$  
+BelowAve: $\hat{y}=21.5$
+
+### Problem 5
+**(a)**
+```{r, echo = FALSE}
+library(ggplot2)
+hos=read.csv("hospital.csv",sep =',',header = TRUE)
+head(hos)
+qplot(Stay,InfctRsk,data=hos)+ggtitle("InfctRsk vs Stay")
+```
+
+**(b)**
+
+```{r, echo = FALSE}
+ggplot(hos,aes(y =InfctRsk ,x =MedSchool)) + geom_boxplot() + ylab("InfctRsk") + xlab("MedSchool") + ggtitle("InfctRsk by Medschool") + coord_flip()
+
+```
+
+From the boxplot, it shows that there is a difference whether the hospital was associated with a Medschool.
+
+**(c)**
+```{r, echo = FALSE}
+```
+The corelation is `r cor(hos$InfctRsk,hos$Stay)`.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+There are some outliers. As shown in the boxplot, there are some outliers aroud the line when "InfctRsk is 8".
+
+**(e)**
+```{r,echo=FALSE}
+the.sd = sd(hos$Stay)
+the.mean=mean(hos$Stay)
+```
+From the minimum of `r the.mean-3*the.sd` to maximum `r mean(hos$Stay)+ 3*sd(hos$Stay)`.
+
+### Problem 6
+**(a)**
+
+```{r, echo = FALSE}
+the.model = lm(InfctRsk ~ .,data= hos)
+the.betas = round(the.model$coefficients,4)
+ggplot(hos,aes(y = InfctRsk, x =Stay,colour=MedSchool,shape=MedSchool)) + geom_point() + geom_smooth(method="lm",fill = NA)
+```
+
+$\hat{y}=0.8628+0.3056X_1+0.3572X_2$. ($X_2$: Stay days, $X_1=0\rightarrow$ without a MedSchool, $X_1=1\rightarrow$ with a MedSchool.)
+
+**(b)**
+```{r, echo = FALSE}
+the.betas
+unique(hos$MedSchool)
+the.model
+```
+
+Without a Medschool: $\hat{y}=0.8628+0.3572X_2$  
+With a Medschool: $\hat{y}=1.1684+0.3572X_2$
+
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+When the hospital was associated with a Medschool, the InfctRsk tends to increase by 0.3056($\beta_1$) percent on average compared to the hospital without a Medschool.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+When the length of days patients stay in the hospital adds one day, the InfctRSk increases 0.3572($\beta_2$) percent on average.
+
+**(e)**
+
+```{r, echo = FALSE}
+x.star=data.frame(Stay=7,MedSchool="No")
+y.star=predict(the.model,x.star)
+```
+
+The estimated value is `r y.star`.
+
+### Problem 7
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+the.line=lm(InfctRsk~MedSchool+Stay+MedSchool*Stay, data=hos)
+the.coef=round(the.line$coefficients, 4)
+the.line
+```
+The regression function is $\hat{y}=`r the.coef[1]`+`r the.coef[2]`X_{1}+`r the.coef[3]`X_{2} `r the.coef[4]`X_{1}X_{2}$.
+
+**(b)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+"MedSchool = Yes", the linear regression function is $\hat{y}=`r the.coef[1]+the.coef[3]`+`r the.coef[2]+the.coef[4]`X_{1}$  
+"MedSchool = No", the linear regression function is $\hat{y}=`r the.coef[1]`+`r the.coef[2]`X_{1}$
+
+**(c)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+The slope of "MedSchool = Yes" regression line means the value of InfctRsk will increase by `r the.coef[2]+the.coef[4]` on average when Stay increases 1 day in the case of "MedSchool = Yes".  
+The slope of "MedSchool = No" regression line means the value of InfctRsk will increase by `r the.coef[2]` on average when Stay increases 1 day in the case of "MedSchool = No".
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+The intercept of category "MedSchool = Yes" means when Stay equals 0, the value of InfctRsk is `r the.coef[1]+the.coef[3]`  on average.  
+The intercept of category MedSchool = No" means when Stay equals 0, the value of InfctRsk is`r the.coef[1]`  on average.  
+The two intercept is inappropriate because it is meaningful that stay in hospital is 0.
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+x.star=data.frame(MedSchool="No",Stay=7)
+y.star=round(predict(the.line, x.star),4)
+```
+
+The estimated value is `r y.star` in the case of "MedSchool=No, Stay=7".
+
+### Problem 8
+**(a)**
+
+FALSE, correlation just measures the linear relationship.
+```{r, echo = FALSE}
+```
+
+**(b)**
+
+FALSE, it will change the estimated value, because it is another model.
+```{r, echo = FALSE}
+
+```
+
+**(c)**
+
+TRUE. When $0<r\leq1$, it means when $X$ increases, $Y$ increases. When $-1\leq r<0$, it means when $X$ increases, $Y$ decreases.
+
+```{r, echo = FALSE}
+
+```
+
+**(d)**
+
+TRUE. It means that $\hat{y_i}<y_i$ and that suggests we underestimated $y_i$.
+```{r, echo = FALSE}
+
+```
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```
