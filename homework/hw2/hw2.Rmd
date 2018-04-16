@@ -1,0 +1,382 @@
+---
+title: "STA101 - HW 2"
+author: "Wangqian Miao"
+output: html_document
+---
+
+
+### Preparation for Dataset
+
+```{r}
+fish=read.csv("fish.csv",sep = ',',header = TRUE)
+hos=read.csv("hospital.csv",sep = ',',header = TRUE)
+pov=read.csv("poverty.csv",sep=',',header=TRUE)
+library(ggplot2)
+```
+
+### Problem 1
+**(a)**
+
+```{r, echo = FALSE}
+the.model=lm(Brth15to17~PovPct,data=pov)
+pov$ei=the.model$residuals
+pov$yhat=the.model$fitted.values
+qqnorm(the.model$residuals)
+qqline(the.model$residuals)
+ei=the.model$residuals
+the.SWtest=shapiro.test(ei)
+the.SWtest
+```
+
+From the QQplot, we know that most points are close to the line, but there exits some outliers.
+
+Test: $H_0$: The errors are normally distributed vs. $H_A$: The errors are not normally distributed.
+
+The p-value for our test is :`r the.SWtest$p.value`
+
+Since our p-value is relatively large, we fail to reject the null, and support that our data is normally distributed at any reasonable significance level (1%, 5%, 10%). 
+
+
+**(b)**
+
+```{r, echo = FALSE}
+qplot(yhat, ei, data = pov) +  ggtitle("Errors vs. Fitted Values") + xlab("Fitted Values") + 
+  ylab("Errors") + geom_hline(yintercept = 0,col = "purple")
+Group = rep("Lower",nrow(pov))
+Group[pov$Brth15to17 < median(pov$Brth15to17)] = "Upper"
+Group = as.factor(Group)
+pov$Group = Group
+the.FKtest= fligner.test(pov$ei, pov$Group)
+the.FKtest
+
+```
+
+From the plot, It shows that the variance is nearly a constant.
+
+Test:I can find the p-value is: `r the.FKtest$p.value`.  This is still larger than any typical alpha, so I support that the lower variance is equal to the upper variance.
+
+**(c)**
+
+```{r, echo = FALSE}
+CD=cooks.distance(the.model)
+cutoff=0.20
+outliers=which(CD>cutoff)
+outliers
+new.data=pov[-outliers,]
+plot(CD,ylab = "Cook's Distance")+abline(h = cutoff)
+```
+
+I use the method of Cook Distance to remove the outliers. 
+The cutoff value is 0.2.
+
+
+**(d)**
+```{r, echo = FALSE}
+new.model=lm(Brth15to17~PovPct,data=new.data)
+new.betas=new.model$coefficients
+the.a=the.model$coefficients
+```
+With outliers, the $\beta s$ are 
+```{r,echo=FALSE}
+the.a
+```
+
+Without outliers, the $\beta s$ are
+
+```{r,echo=FALSE}
+new.betas
+```
+
+### Problem 2
+**(a)**
+
+```{r, echo = FALSE}
+alpha=0.1
+the.CIs=confint(new.model,level = 1-alpha)
+the.CIs
+```
+
+Thus the CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)
+```{r,echo=FALSE}
+the.CIs[2,]
+```
+**(b)**
+```{r, echo = FALSE}
+
+```
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+
+**(d)**
+```{r, echo = FALSE}
+summary(new.model)$coefficients
+
+```
+### Problem 3
+**(a)**
+
+```{r, echo = FALSE}
+the.model=lm(InfctRsk~MedSchool+Stay,data=hos)
+hos$ei=the.model$residuals
+hos$yhat=the.model$fitted.values
+qqnorm(the.model$residuals)
+qqline(the.model$residuals)
+ei=the.model$residuals
+the.SWtest=shapiro.test(ei)
+the.SWtest
+```
+
+From the QQplot, we know that most points are close to the line which suggets the $e_i$ is normal, but there exits some outliers.
+
+Test $H_0$: The errors are normally distributed vs. $H_A$: The errors are not normally distributed.
+
+The p-value for our test was : `r the.SWtest$p.value`
+
+Whether we will reject the null depends on the $\alpha$ we choose. 
+
+**(b)**
+
+```{r, echo = FALSE}
+qplot(yhat, ei, data = hos) +  ggtitle("Errors vs. Fitted Values") + xlab("Fitted Values") + 
+  ylab("Errors") + geom_hline(yintercept = 0,col = "purple")
+Group = rep("Lower",nrow(hos))
+Group[hos$InfctRsk < median(hos$InfctRsk)] = "Upper"
+Group = as.factor(Group)
+hos$Group = Group
+the.FKtest= fligner.test(hos$ei, hos$Group)
+the.FKtest
+```
+
+From the plot, It shows that the variance is nearly a constant, but there exits some outliers.
+
+FKTest: I can find the p-value is: `r the.FKtest$p.value`. 
+
+Whether I should reject $H_o$ depends on $\alpha$.
+
+
+**(c)**
+
+```{r, echo = FALSE}
+CD=cooks.distance(the.model)
+cutoff=0.20
+outliers=which(CD>cutoff)
+outliers
+new.data=hos[-outliers,]
+plot(CD,ylab = "Cook's Distance")+abline(h = cutoff)
+```
+
+I use the method of Cook Distance to remove the outliers. 
+The cutoff value is 0.2.
+
+**(d)**
+
+```{r, echo = FALSE}
+new.model=lm(InfctRsk~MedSchool+Stay,data=new.data)
+new.betas=new.model$coefficients
+the.a=the.model$coefficients
+```
+
+With outliers, the $\beta s$ are 
+```{r,echo=FALSE}
+the.a
+```
+
+Without outliers, the $\beta s$ are
+
+```{r,echo=FALSE}
+new.betas
+```
+
+### Problem 4
+**(a)**
+```{r, echo = FALSE}
+alpha=0.1
+the.CIs=confint(new.model,level = 1-alpha)
+the.CIs
+```
+The CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)  
+The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`)
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+
+**(c)**
+```{r, echo = FALSE}
+summary(new.model)$coefficients
+```
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+### Problem 5
+**(a)**
+```{r, echo = FALSE}
+the.model=lm(InfctRsk~MedSchool+Stay+MedSchool*Stay,data=hos)
+the.beta=the.model$coefficients
+the.beta
+```
+
+$Y=`r the.beta[1]` + `r the.beta[2]`X_1 +`r the.beta[3]`X_2  `r the.beta[4]`X_1X_2$
+
+**(b)**
+
+```{r, echo = FALSE}
+alpha=0.1
+the.CIs=confint(the.model,level = 1-alpha)
+the.CIs
+```
+
+The CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)   
+
+The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`)  
+
+The CI for $\beta_3$ is (`r the.CIs[4,1]`,`r the.CIs[4,2]`)
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+$X_2$ should be retained. Because its CI does not contain 0.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+### Problem 6
+**(a)**
+
+
+```{r, echo = FALSE}
+the.model=lm(Length~Age+Temp,data=fish)
+fish$ei=the.model$residuals
+fish$yhat=the.model$fitted.values
+qqnorm(the.model$residuals)
+qqline(the.model$residuals)
+ei=the.model$residuals
+the.SWtest=shapiro.test(ei)
+the.SWtest
+```
+
+From the QQplot, we know that most points are close to the line which means that $e_i$ are normally distributed, but there exits some outliers.
+
+Test: $H_0$: The errors are normally distributed vs. $H_A$: The errors are not normally distributed.
+
+The p-value for our test was :`r the.SWtest$p.value`
+
+Since our p-value was relatively large, we fail to reject the null, and support that our data is normally distributed at any reasonable significance level (1%, 5%, 10%). 
+
+**(b)**
+
+```{r, echo = FALSE}
+qplot(yhat, ei, data = fish) +  ggtitle("Errors vs. Fitted Values") + xlab("Fitted Values") + 
+  ylab("Errors") + geom_hline(yintercept = 0,col = "purple")
+Group = rep("Lower",nrow(fish))
+Group[fish$Length < median(fish$Length)] = "Upper"
+Group = as.factor(Group)
+fish$Group = Group
+the.FKtest= fligner.test(fish$ei, fish$Group)
+the.FKtest
+```
+
+
+From the plot, It shows that the variance is not a constant.
+
+FKTest: I can find the p-value is: `r the.FKtest$p.value`. 
+
+
+**(c)**
+
+```{r, echo = FALSE}
+CD=cooks.distance(the.model)
+cutoff=0.20
+outliers=which(CD>cutoff)
+new.data=fish[-outliers,]
+plot(CD,ylab = "Cook's Distance")+abline(h = cutoff)
+```
+
+**(d)**
+
+```{r, echo = FALSE}
+new.model=lm(Length~Age+Temp,data=new.data)
+new.betas=new.model$coefficients
+the.a=the.model$coefficients
+```
+
+With outliers, the $\beta s$ are 
+```{r,echo=FALSE}
+the.a
+```
+
+Without outliers, the $\beta s$ are
+
+```{r,echo=FALSE}
+new.betas
+```
+### Problem 7
+**(a)**
+```{r, echo = FALSE}
+alpha=0.1
+the.CIs=confint(new.model,level = 1-alpha)
+the.CIs
+```
+
+The CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)  
+
+The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`)
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+
+**(c)**
+```{r, echo = FALSE}
+summary(new.model)$coefficient
+```
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+### Problem 8
+**(a)**
+```{r, echo = FALSE}
+head(fish)
+the.model=lm(Length~Age+Temp+Age*Temp,data=fish)
+the.beta=the.model$coefficients
+the.beta
+```
+
+$Y=`r the.beta[1]` + `r the.beta[2]`X_1 +`r the.beta[3]`X_2  `r the.beta[4]`X_1X_2$
+
+**(b)**
+```{r, echo = FALSE}
+alpha=0.1
+the.CIs=confint(the.model,level = 1-alpha)
+the.CIs
+```
+
+The CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)   
+
+The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`) 
+
+The CI for $\beta_3$ is (`r the.CIs[4,1]`,`r the.CIs[4,2]`)
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```

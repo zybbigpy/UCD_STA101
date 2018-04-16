@@ -143,7 +143,6 @@ The regression line is $\hat{y}=21.4167+6.3333X_1+0.0833X_2$.
 
 **(b)**
 ```{r, echo = FALSE}
-
 ```
 The days needed for a successful completion therapy tends to increase by 6.3333 ($\beta_1$) days on average when the fitness level is
 Ave instead of AboveAve. 
