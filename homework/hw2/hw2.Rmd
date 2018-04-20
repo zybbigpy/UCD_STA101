@@ -1,13 +1,16 @@
 ---
 title: "STA101 - HW 2"
 author: "Wangqian Miao"
-output: html_document
+output:
+  html_document:
+    fig_width: 5.5
+    fig_height: 4
 ---
 
 
 ### Preparation for Dataset
 
-```{r}
+```{r,echo=FALSE}
 fish=read.csv("fish.csv",sep = ',',header = TRUE)
 hos=read.csv("hospital.csv",sep = ',',header = TRUE)
 pov=read.csv("poverty.csv",sep=',',header=TRUE)
@@ -36,7 +39,6 @@ The p-value for our test is :`r the.SWtest$p.value`
 
 Since our p-value is relatively large, we fail to reject the null, and support that our data is normally distributed at any reasonable significance level (1%, 5%, 10%). 
 
-
 **(b)**
 
 ```{r, echo = FALSE}
@@ -53,7 +55,7 @@ the.FKtest
 
 From the plot, It shows that the variance is nearly a constant.
 
-Test:I can find the p-value is: `r the.FKtest$p.value`.  This is still larger than any typical alpha, so I support that the lower variance is equal to the upper variance.
+FKTest:I can find the p-value is: `r the.FKtest$p.value`.  This is still larger than any typical alpha, so I fail to reject $H_0$ and support that the variance is contant.
 
 **(c)**
 
@@ -86,6 +88,7 @@ Without outliers, the $\beta s$ are
 ```{r,echo=FALSE}
 new.betas
 ```
+The absolute difference of $\beta_2$ is `r the.a[2]-new.betas[2]`.
 
 ### Problem 2
 **(a)**
@@ -97,24 +100,34 @@ the.CIs
 ```
 
 Thus the CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)
-```{r,echo=FALSE}
-the.CIs[2,]
-```
+
 **(b)**
 ```{r, echo = FALSE}
 
 ```
+We are 90% confident that when PovPct increases 1 percent, Brth15to17 rate will increase by between 0.948736 and 1.573825 on average., holding other variables are constant. 
 
 **(c)**
 ```{r, echo = FALSE}
 
 ```
+It shows that there exits a significant linear relationship. Because the Ci does not contain 0.
 
 **(d)**
 ```{r, echo = FALSE}
 summary(new.model)$coefficients
 
 ```
+
+test statistic: $t_{s}=\frac{\hat{\beta_{1}}-0}{SE\{\hat{\beta_{1}}\}}$  
+`  
+$H_{0}$:$\beta_{1}=0$.  
+$H_{A}$:$\beta_{1}\neq 0$.  
+p-value is small and we will reject $H_{0}$. So, there exists significant linear relationship between $X_{1}$ and $Y$.
+
+**(e)**
+If there was no linear relationship between PocPCt and Brth15to17, we would observe our data or more extreme  1.67e-6%  of the time.  
+
 ### Problem 3
 **(a)**
 
@@ -135,7 +148,9 @@ Test $H_0$: The errors are normally distributed vs. $H_A$: The errors are not no
 
 The p-value for our test was : `r the.SWtest$p.value`
 
-Whether we will reject the null depends on the $\alpha$ we choose. 
+Whether we will reject the null depends on the $\alpha$ we choose.  
+When $\alpha=0.01,0.05$, we will reject null. The errors are not normally distributed.  
+When $\alpha=0.10$. We will accept null. The errors are normally distributed.
 
 **(b)**
 
@@ -154,8 +169,9 @@ From the plot, It shows that the variance is nearly a constant, but there exits 
 
 FKTest: I can find the p-value is: `r the.FKtest$p.value`. 
 
-Whether I should reject $H_o$ depends on $\alpha$.
-
+Whether I should reject $H_0$ depends on $\alpha$.  
+When $\alpha=0.01,0.05$, we will reject null. The lower error variance is not equal to the upper error variance, so the variance is not constant.  
+When $\alpha=0.10$, we will accept the null. The lower error variance is equal to the upper error variance, the variance is a constant.
 
 **(c)**
 
@@ -189,7 +205,7 @@ Without outliers, the $\beta s$ are
 ```{r,echo=FALSE}
 new.betas
 ```
-
+The absolute difference of $\beta_2$ is `r -the.a[3]+new.betas[3]`.
 ### Problem 4
 **(a)**
 ```{r, echo = FALSE}
@@ -204,25 +220,38 @@ The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`)
 ```{r, echo = FALSE}
 
 ```
+We are 90% confident in that when the Stay of days in hospital increases one day, the InfctRsk would increase between 0.3519035 and 0.6031979 percent on average, holding other variables onstant. 
 
 **(c)**
 ```{r, echo = FALSE}
-summary(new.model)$coefficients
+
 ```
+
+There exists a significant linear relationship between Stay and InfctRsk because the CI for $\beta_2$ does not contain 0.
 
 **(d)**
 ```{r, echo = FALSE}
-
+summary(new.model)$coefficients
 ```
+test statistic: $t_{s}=\frac{\hat{\beta_{1}}-0}{SE\{\hat{\beta_{1}}\}}$  
+$H_{0}$:$\beta_{1}=0$.  
+$H_{A}$:$\beta_{1}\neq 0$.  
+p-value is small and we will reject $H_{0}$. So, there exists significant linear relationship between $X_{2}$ and $Y$.
+
+**(e)**
+If there was no linear relationship between Stay and InfctRsk, we would observe our data or more extreme 6.42e-7% of the time.
+
+If there was no linear relationship between Medschool and InfctRsk, we would observe our data or more extreme 44% of the time.
+
 ### Problem 5
 **(a)**
 ```{r, echo = FALSE}
-the.model=lm(InfctRsk~MedSchool+Stay+MedSchool*Stay,data=hos)
+the.model=lm(InfctRsk~MedSchool+Stay+MedSchool*Stay,data=new.data)
 the.beta=the.model$coefficients
 the.beta
 ```
 
-$Y=`r the.beta[1]` + `r the.beta[2]`X_1 +`r the.beta[3]`X_2  `r the.beta[4]`X_1X_2$
+$\hat{y}=`r the.beta[1]`  `r the.beta[2]`X_1 +`r the.beta[3]`X_2 + `r the.beta[4]`X_1X_2$
 
 **(b)**
 
@@ -248,6 +277,8 @@ $X_2$ should be retained. Because its CI does not contain 0.
 ```{r, echo = FALSE}
 
 ```
+When $X_{1}$ changes by 1 unit, we can expect the largiest change in $Y$.
+
 ### Problem 6
 **(a)**
 
@@ -288,17 +319,18 @@ the.FKtest
 From the plot, It shows that the variance is not a constant.
 
 FKTest: I can find the p-value is: `r the.FKtest$p.value`. 
-
+p-value is large and we fail to reject $H_0$. So, the lower error variance is equal to the upper error variance, the variance is a constant. 
 
 **(c)**
 
 ```{r, echo = FALSE}
 CD=cooks.distance(the.model)
-cutoff=0.20
+cutoff=0.10
 outliers=which(CD>cutoff)
 new.data=fish[-outliers,]
 plot(CD,ylab = "Cook's Distance")+abline(h = cutoff)
 ```
+I use the method of cook distance to remove the outliers, the cutoff is 0.1.
 
 **(d)**
 
@@ -318,6 +350,8 @@ Without outliers, the $\beta s$ are
 ```{r,echo=FALSE}
 new.betas
 ```
+The absolute difference of $\beta_1$ is `r new.betas[2]-the.a[2]`.
+
 ### Problem 7
 **(a)**
 ```{r, echo = FALSE}
@@ -334,31 +368,44 @@ The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`)
 ```{r, echo = FALSE}
 
 ```
+We are 90% constant in that when the Age increase one year, the Length of the fish will increase between 24.41 and 31.01 mm on avrage, holding other variables constant.
 
 **(c)**
 ```{r, echo = FALSE}
-summary(new.model)$coefficient
+
 ```
+It suggests that there exists a significant linear relationship between Temop and Length, because its CI does not contain 0.
 
 **(d)**
 ```{r, echo = FALSE}
-
+summary(new.model)$coefficients
 ```
+test statistic: $t_{s}=\frac{\hat{\beta_{2}}-0}{SE\{\hat{\beta_{2}}\}}$  
+$H_{0}$:$\beta_{2}=0$.  
+$H_{A}$:$\beta_{2}\neq 0$.  
+p-value=0.048, Whether we will reject $H_0$ depends on $\alpha$ we choose.  
+When $\alpha=0.01$, p-value is large enough to reject $H_{0}$. As a result, $\beta_{2}\neq0$,which shows a significant linear relationship between $X_{2}$ and $Y$.  
+When$\alpha=0.05$ or $\alpha=0.10$, p-value is not large enough to reject $H_{0}$. As a result, $\beta_{2}=0$,which shows there is not a significant linear relationship between $X_{2}$ and $Y$.  
+
+
+**(e)**
+
+If there was no linear relationship between Length and Temp, we would observe our data or more extreme 3.416% of the time.
+
 ### Problem 8
 **(a)**
 ```{r, echo = FALSE}
-head(fish)
-the.model=lm(Length~Age+Temp+Age*Temp,data=fish)
-the.beta=the.model$coefficients
-the.beta
+a.model=lm(Length~Age+Temp+Age*Temp,data=new.data)
+a.m=a.model$coefficients
+a.m
 ```
 
-$Y=`r the.beta[1]` + `r the.beta[2]`X_1 +`r the.beta[3]`X_2  `r the.beta[4]`X_1X_2$
+$\hat{y}=`r a.m[1]` + `r a.m[2]`X_1 `r a.m[3]`X_2  `r a.m[4]`X_1X_2$
 
 **(b)**
 ```{r, echo = FALSE}
 alpha=0.1
-the.CIs=confint(the.model,level = 1-alpha)
+the.CIs=confint(a.model,level = 1-alpha)
 the.CIs
 ```
 
@@ -366,17 +413,46 @@ The CI for $\beta_1$ is (`r the.CIs[2,1]`,`r the.CIs[2,2]`)
 
 The CI for $\beta_2$ is (`r the.CIs[3,1]`,`r the.CIs[3,2]`) 
 
-The CI for $\beta_3$ is (`r the.CIs[4,1]`,`r the.CIs[4,2]`)
+The CI for $\beta_3$ is (`r the.CIs[4,]`) 
 
 **(c)**
 ```{r, echo = FALSE}
 
 ```
+$\beta_1$ should be retained because its CI does not contain 0.
 
 **(d)**
 ```{r, echo = FALSE}
 
 ```
+When $X_{2}$ changes by 1 unit, we can expect the largiest change in $Y$. 
+
+
+### Problem 9
+**(a)**
+
+TRUE.   
+
+Accoding to $R^{2}=\frac{SSTO-SSE}{SSTO}$ and $SSTO$ is a constant, we know that $SSE$ of the large model is smaller and the conclusion is that the model with the most $X$ variables has the larggest $R^{2}$.
+
+**(b)**
+
+TRUE.  
+
+If CI of a $\beta_{i}$ does not contain $0$, it means when $X_{i}$ increases, we are confident that $Y$ will change its value in CI, which means there exists a inear relationship between $X_{i}$ and $Y$. 
+
+**(c)**
+
+TRUE.   
+
+Outliers can significantly change the slope because they are always away from the fitted line. 
+
+**(d)**
+
+TRUE.  
+
+According to $AIC=-2LL+2p$, if we want to maximize LL then we should minimize AIC.
+
 ### R Appendix
 ```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
 ```
