@@ -1,0 +1,198 @@
+---
+title: "STA101 - HW 3"
+author: "Wangqian Miao"
+output:
+  html_document:
+    fig_width: 5.5
+    fig_height: 4
+---
+
+```{r,echo=FALSE,warning=FALSE}
+mydata=read.csv("salary3.csv",sep = ",",head=TRUE)
+```
+```{r, echo = FALSE,warning=FALSE}
+All.Criteria = function(the.model){
+  p = length(the.model$coefficients)
+  n = length(the.model$residuals)
+  the.BIC = BIC(the.model)
+  the.LL = logLik(the.model)
+  the.AIC = AIC(the.model)
+  the.PRESS = PRESS(the.model)
+  the.R2adj = summary(the.model)$adj.r.squared
+  the.results = c(the.LL,p,n,the.AIC,the.BIC,the.PRESS,the.R2adj)
+  names(the.results) = c("LL","p","n","AIC","BIC","PRESS","R2adj")
+  return(the.results)
+}
+```
+
+```{r, echo = FALSE, warning=FALSE}
+Partial.R2 = function(small.model,big.model){
+  SSE1 = sum(small.model$residuals^2)
+  SSE2 = sum(big.model$residuals^2)
+  PR2 = (SSE1 - SSE2)/SSE1
+  return(PR2)
+}
+```
+```{r}
+library(MPV)
+library(leaps)
+```
+### Problem 1
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+smaller.model = lm(sl ~ yd + dg + sx, data = mydata)
+anova.small = anova(smaller.model)
+larger.model = lm(sl ~ yd + dg + sx + rk, data = mydata)
+anova.large = anova(larger.model)
+anova.sum=anova(smaller.model,larger.model)
+anova.sum
+```
+
+$H_{0}: \beta_{4}=0$, $H_{A}: \beta_{4}\neq0$. 
+
+F-test: $F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/\frac{SSE(L)}{d.f.(L)}$  
+
+$F_{s}=`r anova.sum[2,5]`$, p-value=$`r anova.sum[2,6]`$.  
+
+
+**(b)**
+
+P-value is less than $\alpha$. So we will reject $H_0$ and the conclusion si that $\beta_4\neq0$, we should not drop $X_4$ in our model.
+
+**(c)**
+```{r, echo=FALSE}
+smaller.model = lm(sl ~ yd + rk, data = mydata)
+anova.sum=anova(smaller.model,larger.model)
+anova.sum
+```
+
+$H_{0}:\beta_{2}=\beta_{3}=0$, $H_{A}$:at least one $\beta_{i}\neq 0, i=2,3$  
+
+F-test: $F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/ \frac{SSE(L)}{d.f.(L)}$  
+
+$F_{s}=`r round(anova.sum[2,5],4)`$, p-value=$`r anova.sum[2,6]`$  
+
+**(d)**
+
+The P-value is large enough for us to fail to reject $H_{0}$.SO we will get the conclusion that $\beta_{2}=\beta_{3}=0$ and we can drop $X_{2}$ and $X_{3}$ from the full model. 
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+the.coef=smaller.model$coefficients
+```
+
+The model I choose is $Y$~$X_{1}+X_{4}$ and the linear regression equation is $\hat{y}=`r round(the.coef[1],4)`+`r round(the.coef[2],4)`X_{1}+`r round(the.coef[3],4)`X_{4}$.
+
+### Problem 2
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+small.model=lm(sl~yd, data=mydata)
+big.model=lm(sl~yd+rk, data=mydata)
+partial.R2=Partial.R2(small.model, big.model)
+```
+
+We will reduce the error by `r partial.R2*100`% if we add $X_4$ in our model. 
+
+**(b)**
+```{r, echo = FALSE, warning=FALSE}
+small.model=lm(sl~rk, data=mydata)
+big.model=lm(sl~yd, data=mydata)
+partial.R2=Partial.R2(small.model, big.model)
+```
+
+$R^2\{X_1|X_4\}$=`r partial.R2`.
+
+It tells us that we will increase the error by `r -round(partial.R2*100, 2)`% if we use $X_1$ in our model istead of using $X_4$ in our model.
+
+**(c)**
+```{r, echo = FALSE, warning=FALSE}
+small.model=lm(sl~yd+rk, data=mydata)
+big.model=lm(sl~yd+dg+sx+rk, data=mydata)
+partial.R2=Partial.R2(small.model, big.model)
+```
+
+$R^2\{X_{1},X_{2},X_{3},X_{4} | X_{1},X_{4}\}=`r partial.R2`$.   
+
+It suggests we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{2}$, $X_{3}$ in our model with $X_{1}$, $X_{4}$.
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+small.model=lm(sl~dg+sx, data=mydata)
+big.model=lm(sl~yd+rk, data=mydata)
+partial.R2=Partial.R2(small.model, big.model)
+```
+
+$R^2\{X_{1},X_{4} | X_{2},X_{3}\}=`r partial.R2`$.  
+
+It means we can reduce the error by `r round(partial.R2*100, 2)`% if we use $X_{1}, X_{4}$ in our model instead of using the model contains $X_{2}, X_{3}$.
+
+**(e)**
+
+
+### Problem 3
+
+```{r, echo = FALSE, warning=FALSE}
+names(mydata) = c("Y","X1","X2","X3","X4" )
+```
+
+```{r, echo = FALSE, warning=FALSE}
+all.models = c("Y ~ X1", "Y ~ X2", "Y ~ X3", "Y ~ X4",
+"Y ~ X1 + X2", "Y ~ X1 + X3", "Y ~ X1 + X4",
+"Y ~ X1 + X2 + X4", "Y ~ X1 + X3 + X4",
+"Y ~ X1 + X2 + X3 + X4")
+```
+
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+all.model.crit = t(sapply(all.models,function(M){
+  current.model = lm(M,data = mydata)
+  All.Criteria(current.model)
+}))
+round(all.model.crit,4)
+```
+
+**(b)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+$Y$~$X_{4}$ is the best model because it has the lowest BIC.
+
+**(c)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+$Y$~$X_{1}+X_{4}$ is the best model beacuse it has the lowest AIC.
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+$Y$~$X_{1}+X_{4}$ is the best model because it has the lowesst PRESS.
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+$Y$~$X_{1}+X_{3}+X_{4}$ is the best model since it has the highest $R^{2}_{adj}$.
+
+**(f)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+I would choose $Y$~$X_{1}+X_{3}+X_{4}$ because higest $R^2_{adj}$ always give us the most "predictive" model.
+
+**(g)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+I would choose $Y$~$X_{4}$ because the smallest BIC always give us the "correctest" model.
+
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```
