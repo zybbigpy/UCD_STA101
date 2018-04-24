@@ -148,7 +148,7 @@ $(document).ready(function () {
 <p>F-test: <span class="math inline">\(F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/\frac{SSE(L)}{d.f.(L)}\)</span></p>
 <p><span class="math inline">\(F_{s}=19.3946479\)</span>, p-value=<span class="math inline">\(7.7908795\times 10^{-7}\)</span>.</p>
 <p><strong>(b)</strong></p>
-<p>P-value is less than <span class="math inline">\(\alpha\)</span>. So we will reject <span class="math inline">\(H_0\)</span> and the conclusion si that <span class="math inline">\(\beta_4\neq0\)</span>, we should not drop <span class="math inline">\(X_4\)</span> in our model.</p>
+<p>P-value is less than <span class="math inline">\(\alpha\)</span>. So we will reject <span class="math inline">\(H_0\)</span> and the conclusion is that <span class="math inline">\(\beta_4\neq0\)</span>, we should not drop <span class="math inline">\(X_4\)</span> in our model.</p>
 <p><strong>(c)</strong></p>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -161,7 +161,7 @@ $(document).ready(function () {
 <p>F-test: <span class="math inline">\(F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/ \frac{SSE(L)}{d.f.(L)}\)</span></p>
 <p><span class="math inline">\(F_{s}=0.6869\)</span>, p-value=<span class="math inline">\(0.5081955\)</span></p>
 <p><strong>(d)</strong></p>
-<p>The P-value is large enough for us to fail to reject <span class="math inline">\(H_{0}\)</span>.SO we will get the conclusion that <span class="math inline">\(\beta_{2}=\beta_{3}=0\)</span> and we can drop <span class="math inline">\(X_{2}\)</span> and <span class="math inline">\(X_{3}\)</span> from the full model.</p>
+<p>The P-value is large enough for us to fail to reject <span class="math inline">\(H_{0}\)</span>. So, we will get the conclusion that <span class="math inline">\(\beta_{2}=\beta_{3}=0\)</span> and we can drop <span class="math inline">\(X_{2}\)</span> and <span class="math inline">\(X_{3}\)</span> from the full model.</p>
 <p><strong>(e)</strong></p>
 <p>The model I choose is <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{1}+X_{4}\)</span> and the linear regression equation is <span class="math inline">\(\hat{y}=1.7166465\times 10^{4}+95.0845X_{1}+4209.6503X_{4}\)</span>.</p>
 </div>
@@ -174,11 +174,12 @@ $(document).ready(function () {
 <p>It tells us that we will increase the error by 121.54% if we use <span class="math inline">\(X_1\)</span> in our model istead of using <span class="math inline">\(X_4\)</span> in our model.</p>
 <p><strong>(c)</strong></p>
 <p><span class="math inline">\(R^2\{X_{1},X_{2},X_{3},X_{4} | X_{1},X_{4}\}=0.0290011\)</span>.</p>
-<p>It suggests we can reduce the error by 2.9% if we add <span class="math inline">\(X_{2}\)</span>, <span class="math inline">\(X_{3}\)</span> in our model with <span class="math inline">\(X_{1}\)</span>, <span class="math inline">\(X_{4}\)</span>.</p>
+<p>It suggests we can reduce the error by 2.9% if we add <span class="math inline">\(X_{2}\)</span>, <span class="math inline">\(X_{3}\)</span> in our model which contains <span class="math inline">\(X_{1}\)</span>, <span class="math inline">\(X_{4}\)</span>.</p>
 <p><strong>(d)</strong></p>
 <p><span class="math inline">\(R^2\{X_{1},X_{4} | X_{2},X_{3}\}=0.7505931\)</span>.</p>
 <p>It means we can reduce the error by 75.06% if we use <span class="math inline">\(X_{1}, X_{4}\)</span> in our model instead of using the model contains <span class="math inline">\(X_{2}, X_{3}\)</span>.</p>
 <p><strong>(e)</strong></p>
+<p>Yes, from (c) we know that adding <span class="math inline">\(X_2, X_3\)</span> in our model will not help a lot in reducing error and will make the model big. But from (a) (b) (d), it is obvious that putting <span class="math inline">\(X_1, X_4\)</span> in our model will reduce a lot of error.</p>
 </div>
 <div id="problem-3" class="section level3">
 <h3>Problem 3</h3>
@@ -216,7 +217,7 @@ $(document).ready(function () {
 <p><strong>(f)</strong></p>
 <p>I would choose <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{1}+X_{3}+X_{4}\)</span> because higest <span class="math inline">\(R^2_{adj}\)</span> always give us the most “predictive” model.</p>
 <p><strong>(g)</strong></p>
-<p>I would choose <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{4}\)</span> because the smallest BIC always give us the “correctest” model.</p>
+<p>I would choose <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{4}\)</span> because the smallest BIC always give us the “correct” model.</p>
 </div>
 <div id="r-appendix" class="section level3">
 <h3>R Appendix</h3>

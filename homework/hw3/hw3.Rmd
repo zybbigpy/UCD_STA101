@@ -57,7 +57,7 @@ $F_{s}=`r anova.sum[2,5]`$, p-value=$`r anova.sum[2,6]`$.
 
 **(b)**
 
-P-value is less than $\alpha$. So we will reject $H_0$ and the conclusion si that $\beta_4\neq0$, we should not drop $X_4$ in our model.
+P-value is less than $\alpha$. So we will reject $H_0$ and the conclusion is that $\beta_4\neq0$, we should not drop $X_4$ in our model.
 
 **(c)**
 ```{r, echo=FALSE}
@@ -74,7 +74,7 @@ $F_{s}=`r round(anova.sum[2,5],4)`$, p-value=$`r anova.sum[2,6]`$
 
 **(d)**
 
-The P-value is large enough for us to fail to reject $H_{0}$.SO we will get the conclusion that $\beta_{2}=\beta_{3}=0$ and we can drop $X_{2}$ and $X_{3}$ from the full model. 
+The P-value is large enough for us to fail to reject $H_{0}$. So, we will get the conclusion that $\beta_{2}=\beta_{3}=0$ and we can drop $X_{2}$ and $X_{3}$ from the full model. 
 
 **(e)**
 ```{r, echo = FALSE, warning=FALSE}
@@ -113,7 +113,7 @@ partial.R2=Partial.R2(small.model, big.model)
 
 $R^2\{X_{1},X_{2},X_{3},X_{4} | X_{1},X_{4}\}=`r partial.R2`$.   
 
-It suggests we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{2}$, $X_{3}$ in our model with $X_{1}$, $X_{4}$.
+It suggests we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{2}$, $X_{3}$ in our model which contains $X_{1}$, $X_{4}$.
 
 **(d)**
 ```{r, echo = FALSE, warning=FALSE}
@@ -127,6 +127,8 @@ $R^2\{X_{1},X_{4} | X_{2},X_{3}\}=`r partial.R2`$.
 It means we can reduce the error by `r round(partial.R2*100, 2)`% if we use $X_{1}, X_{4}$ in our model instead of using the model contains $X_{2}, X_{3}$.
 
 **(e)**
+
+Yes, from (c) we know that adding $X_2, X_3$ in our model will not help a lot in reducing error and will make the model big. But from (a) (b) (d), it is obvious that putting $X_1, X_4$ in our model will reduce a lot of error.
 
 
 ### Problem 3
@@ -191,7 +193,7 @@ I would choose $Y$~$X_{1}+X_{3}+X_{4}$ because higest $R^2_{adj}$ always give us
 
 ```
 
-I would choose $Y$~$X_{4}$ because the smallest BIC always give us the "correctest" model.
+I would choose $Y$~$X_{4}$ because the smallest BIC always give us the "correct" model.
 
 ### R Appendix
 ```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
