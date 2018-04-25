@@ -48,7 +48,7 @@ anova.sum=anova(smaller.model,larger.model)
 anova.sum
 ```
 
-$H_{0}: \beta_{4}=0$, $H_{A}: \beta_{4}\neq0$. 
+$H_{0}: \beta_{4}=\beta_5=0$, $H_{A}:$ At least one$\beta_i\neq0, i=4,5$. 
 
 F-test: $F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/\frac{SSE(L)}{d.f.(L)}$  
 
@@ -57,7 +57,7 @@ $F_{s}=`r anova.sum[2,5]`$, p-value=$`r anova.sum[2,6]`$.
 
 **(b)**
 
-P-value is less than $\alpha$. So we will reject $H_0$ and the conclusion is that $\beta_4\neq0$, we should not drop $X_4$ in our model.
+P-value is less than $\alpha$. So we will reject $H_0$ and the conclusion is that we should not drop $X_4$ in our model.
 
 **(c)**
 ```{r, echo=FALSE}
@@ -81,7 +81,7 @@ The P-value is large enough for us to fail to reject $H_{0}$. So, we will get th
 the.coef=smaller.model$coefficients
 ```
 
-The model I choose is $Y$~$X_{1}+X_{4}$ and the linear regression equation is $\hat{y}=`r round(the.coef[1],4)`+`r round(the.coef[2],4)`X_{1}+`r round(the.coef[3],4)`X_{4}$.
+The model I choose is $Y$~$X_{1}+X_{4}$ and the linear regression equation is $\hat{y}=`r round(the.coef[1],4)`+`r round(the.coef[2],4)`X_{1}+`r round(the.coef[3],4)`X_{4,associate}+`r round(the.coef[4],4)`X_{4,full}$.
 
 ### Problem 2
 **(a)**

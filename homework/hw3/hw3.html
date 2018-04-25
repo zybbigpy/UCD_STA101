@@ -144,11 +144,11 @@ $(document).ready(function () {
 ## 2     46 403725768  2 340439961 19.395 7.791e-07 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
-<p><span class="math inline">\(H_{0}: \beta_{4}=0\)</span>, <span class="math inline">\(H_{A}: \beta_{4}\neq0\)</span>.</p>
+<p><span class="math inline">\(H_{0}: \beta_{4}=\beta_5=0\)</span>, <span class="math inline">\(H_{A}:\)</span> At least one<span class="math inline">\(\beta_i\neq0, i=4,5\)</span>.</p>
 <p>F-test: <span class="math inline">\(F_{s}=\frac{SSE(S)-SSE(L)}{d.f.(S)-d.f.(L)}/\frac{SSE(L)}{d.f.(L)}\)</span></p>
 <p><span class="math inline">\(F_{s}=19.3946479\)</span>, p-value=<span class="math inline">\(7.7908795\times 10^{-7}\)</span>.</p>
 <p><strong>(b)</strong></p>
-<p>P-value is less than <span class="math inline">\(\alpha\)</span>. So we will reject <span class="math inline">\(H_0\)</span> and the conclusion is that <span class="math inline">\(\beta_4\neq0\)</span>, we should not drop <span class="math inline">\(X_4\)</span> in our model.</p>
+<p>P-value is less than <span class="math inline">\(\alpha\)</span>. So we will reject <span class="math inline">\(H_0\)</span> and the conclusion is that we should not drop <span class="math inline">\(X_4\)</span> in our model.</p>
 <p><strong>(c)</strong></p>
 <pre><code>## Analysis of Variance Table
 ## 
@@ -163,7 +163,7 @@ $(document).ready(function () {
 <p><strong>(d)</strong></p>
 <p>The P-value is large enough for us to fail to reject <span class="math inline">\(H_{0}\)</span>. So, we will get the conclusion that <span class="math inline">\(\beta_{2}=\beta_{3}=0\)</span> and we can drop <span class="math inline">\(X_{2}\)</span> and <span class="math inline">\(X_{3}\)</span> from the full model.</p>
 <p><strong>(e)</strong></p>
-<p>The model I choose is <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{1}+X_{4}\)</span> and the linear regression equation is <span class="math inline">\(\hat{y}=1.7166465\times 10^{4}+95.0845X_{1}+4209.6503X_{4}\)</span>.</p>
+<p>The model I choose is <span class="math inline">\(Y\)</span>~<span class="math inline">\(X_{1}+X_{4}\)</span> and the linear regression equation is <span class="math inline">\(\hat{y}=1.7166465\times 10^{4}+95.0845X_{1}+4209.6503X_{4,associate}+1.0310296\times 10^{4}X_{4,full}\)</span>.</p>
 </div>
 <div id="problem-2" class="section level3">
 <h3>Problem 2</h3>
