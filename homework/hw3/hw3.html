@@ -170,14 +170,14 @@ $(document).ready(function () {
 <p><strong>(a)</strong></p>
 <p>We will reduce the error by 57.2440286% if we add <span class="math inline">\(X_4\)</span> in our model.</p>
 <p><strong>(b)</strong></p>
-<p><span class="math inline">\(R^2\{X_1|X_4\}\)</span>=-1.2154391.</p>
-<p>It tells us that we will increase the error by 121.54% if we use <span class="math inline">\(X_1\)</span> in our model istead of using <span class="math inline">\(X_4\)</span> in our model.</p>
+<p><span class="math inline">\(R^2\{X_1,X_4|X_4\}\)</span>=0.0527675.</p>
+<p>It tells us that we will reduce the error by 5.28% if we add <span class="math inline">\(X_1\)</span> in our model with <span class="math inline">\(X-4\)</span> istead of using the model which only contains <span class="math inline">\(X_4\)</span>.</p>
 <p><strong>(c)</strong></p>
 <p><span class="math inline">\(R^2\{X_{1},X_{2},X_{3},X_{4} | X_{1},X_{4}\}=0.0290011\)</span>.</p>
-<p>It suggests we can reduce the error by 2.9% if we add <span class="math inline">\(X_{2}\)</span>, <span class="math inline">\(X_{3}\)</span> in our model which contains <span class="math inline">\(X_{1}\)</span>, <span class="math inline">\(X_{4}\)</span>.</p>
+<p>It suggests we can reduce the error by 2.9% if we add <span class="math inline">\(X_{2}\)</span>, <span class="math inline">\(X_{3}\)</span> in our model with <span class="math inline">\(X_1,X_4\)</span> instead of using the model which only contains <span class="math inline">\(X_{1}\)</span>, <span class="math inline">\(X_{4}\)</span>.</p>
 <p><strong>(d)</strong></p>
-<p><span class="math inline">\(R^2\{X_{1},X_{4} | X_{2},X_{3}\}=0.7505931\)</span>.</p>
-<p>It means we can reduce the error by 75.06% if we use <span class="math inline">\(X_{1}, X_{4}\)</span> in our model instead of using the model contains <span class="math inline">\(X_{2}, X_{3}\)</span>.</p>
+<p><span class="math inline">\(R^2\{X_{1},X_{4},X_2,X_3 | X_{2},X_{3}\}=0.7578261\)</span>.</p>
+<p>It means we can reduce the error by 75.78% if we add <span class="math inline">\(X_{1}, X_{4}\)</span> in our model with <span class="math inline">\(X_2, X_3\)</span> instead of using the model only contains <span class="math inline">\(X_{2}, X_{3}\)</span>.</p>
 <p><strong>(e)</strong></p>
 <p>Yes, from (c) we know that adding <span class="math inline">\(X_2, X_3\)</span> in our model will not help a lot in reducing error and will make the model big. But from (a) (b) (d), it is obvious that putting <span class="math inline">\(X_1, X_4\)</span> in our model will reduce a lot of error.</p>
 </div>
@@ -256,13 +256,13 @@ small.model=lm(sl~yd, data=mydata)
 big.model=lm(sl~yd+rk, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 small.model=lm(sl~rk, data=mydata)
-big.model=lm(sl~yd, data=mydata)
+big.model=lm(sl~yd+rk, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 small.model=lm(sl~yd+rk, data=mydata)
 big.model=lm(sl~yd+dg+sx+rk, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 small.model=lm(sl~dg+sx, data=mydata)
-big.model=lm(sl~yd+rk, data=mydata)
+big.model=lm(sl~yd+rk+dg+sx, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 names(mydata) = c(&quot;Y&quot;,&quot;X1&quot;,&quot;X2&quot;,&quot;X3&quot;,&quot;X4&quot; )
 all.models = c(&quot;Y ~ X1&quot;, &quot;Y ~ X2&quot;, &quot;Y ~ X3&quot;, &quot;Y ~ X4&quot;,

@@ -96,13 +96,13 @@ We will reduce the error by `r partial.R2*100`% if we add $X_4$ in our model.
 **(b)**
 ```{r, echo = FALSE, warning=FALSE}
 small.model=lm(sl~rk, data=mydata)
-big.model=lm(sl~yd, data=mydata)
+big.model=lm(sl~yd+rk, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 ```
 
-$R^2\{X_1|X_4\}$=`r partial.R2`.
+$R^2\{X_1,X_4|X_4\}$=`r partial.R2`.
 
-It tells us that we will increase the error by `r -round(partial.R2*100, 2)`% if we use $X_1$ in our model istead of using $X_4$ in our model.
+It tells us that we will reduce the error by `r round(partial.R2*100, 2)`% if we add $X_1$ in our model with $X-4$ istead of using the model which only contains $X_4$.
 
 **(c)**
 ```{r, echo = FALSE, warning=FALSE}
@@ -113,18 +113,18 @@ partial.R2=Partial.R2(small.model, big.model)
 
 $R^2\{X_{1},X_{2},X_{3},X_{4} | X_{1},X_{4}\}=`r partial.R2`$.   
 
-It suggests we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{2}$, $X_{3}$ in our model which contains $X_{1}$, $X_{4}$.
+It suggests we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{2}$, $X_{3}$ in our model with $X_1,X_4$ instead of using the model which only contains $X_{1}$, $X_{4}$.
 
 **(d)**
 ```{r, echo = FALSE, warning=FALSE}
 small.model=lm(sl~dg+sx, data=mydata)
-big.model=lm(sl~yd+rk, data=mydata)
+big.model=lm(sl~yd+rk+dg+sx, data=mydata)
 partial.R2=Partial.R2(small.model, big.model)
 ```
 
-$R^2\{X_{1},X_{4} | X_{2},X_{3}\}=`r partial.R2`$.  
+$R^2\{X_{1},X_{4},X_2,X_3 | X_{2},X_{3}\}=`r partial.R2`$.  
 
-It means we can reduce the error by `r round(partial.R2*100, 2)`% if we use $X_{1}, X_{4}$ in our model instead of using the model contains $X_{2}, X_{3}$.
+It means we can reduce the error by `r round(partial.R2*100, 2)`% if we add $X_{1}, X_{4}$ in our model with $X_2, X_3$ instead of using the model only contains $X_{2}, X_{3}$.
 
 **(e)**
 
