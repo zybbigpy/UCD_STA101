@@ -3,7 +3,6 @@
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{graphicx}
 \usepackage{fontspec}
-\usepackage{times}
 \usepackage{booktabs}
 \usepackage{indentfirst}
 \usepackage{enumitem}
@@ -42,9 +41,9 @@
 \renewcommand{\baselinestretch}{1.1}
 \parindent 22pt
 
-\title{\huge Analyzing Hospital Dataset Using Linear Regression }
+\title{\Large \textbf{Analyzing Hospital Dataset Using Linear Regression }}
 \author{
-Wangqian Miao\footnote{The two authors are all exchange students from Nanjing university}
+Wangqian Miao\footnote{Two authors are both exchange students from Nanjing University.}
 \\[2pt]
 {\large \textit{Kuang Yaming Hornors School, Biophysics, Nanjing University}}\\[6pt]
 Mingyi Xue\\[2pt]
@@ -85,16 +84,16 @@ Instructor: Dr. Erin K. Melcon\\[2pt]
 \tableofcontents
 \newpage
 \section{Introduction}
-In this article, we use the linear regression model to analyze the dataset of ``Hospfull.csv" which describes characteristics of the United States Hospitals.
+In this article, we applied the linear regression model to analyze the dataset of ``Hospfull.csv", which describes characteristics of United States Hospitals.
 The source of this data is the text: ``Applied Linear Statistical Models, fifth edition, Kutner, Nachtsheim, Neter,
 and Li."\par
-Our goal is predicting the average estimated probability of acquiring infection in hospital (in percantage) by finding the important explanary variables. Depending on the tools and techniques we learn in linear regression, we will build a ``correct" model and make the prediction. \par
-Firstly, we will use the full model and make the improvement later. In the dataset,
-we choose ``Infect'' as our response variable $Y$ and let other variables be the explanary variables $X_i$. So, the linear regression model is:
+Our goal is to predict the average estimated probability of acquiring infection in hospital (in percantage) by finding the important explanary variables. Depending on the tools and techniques we learn in linear regression, we decided to build a ``correct" model instead of ``predict" model and make the prediction. \par
+We started at the full model and would make improvements and adjustments step by step. In the dataset,
+we chose ``Infect'' as the response variable $Y$ and other variables as explanary variables $X_i$. So the linear regression model is:
 \begin{equation}
 Y=\beta_0+\beta_1X_1+\beta_2X_2+\beta_3X_3+\beta_4X_4+\beta_5X_5+\varepsilon
 \end{equation}
-We make a summary table as following to intepret the variables. 
+A summary table is listed as follows to intepret these variables. 
  \begin{table}[htbp]
  	\centering
  	\begin{tabular}{cccc}
@@ -113,23 +112,23 @@ We make a summary table as following to intepret the variables.
  \end{table}
 \section{Summary}
 
-\subsection{Analyzing the Sample Correlation Coeffient}
-Firstly,we analyze the correlaytion coeffient between $Y$ and numerical variables to find whether the linear relationship between $Y$ and $X_i$ is strong enough.
+\subsection{Analyzing the Sample Correlation Coefficients}
+Firstly,we analyzed the correlation coefficient between $Y$ and numeric variables to find whether there is a significant linear relationship between $Y$ and $X_i$. A summary table and explanation of correlation coeffients is listed in the following table.
  \begin{table}[htbp]
 	\centering
 	\begin{tabular}{ccc}
 		\midrule[1.5pt]
-		 $Y$ v.s. $X_i$&Correlation Coeffient & Linear Relationship Strength\\
+		 $Y$ v.s. $X_i$&Correlation Coefficient & Linear Relationship Strength\\
 		\hline
 	    $X_1$ &  0.5334& Moderate \& Positive\\
 		$X_2$ &  0.5592 &Moderate \& Positive  \\
 		$X_3$ &  0.3598& Weak \& Positive  \\
 		\midrule[1.5pt]
 	\end{tabular}
-	\caption{A summary table for the variables }
+	\caption{A summary table of correlation coefficients }
 \end{table}
-\subsection{Scatter Plot}
-
+\subsection{Scatter Plots}
+Scatter plots can also help us find whether there is a linear pattern or some trend between $Y$ and $X_i$. According to following plots, it is obvious that $Y$ increases when $X_1$ and $X_2$ inreases.
 \begin{figure}[H]
 	\centering
 	\subfigure{
@@ -143,9 +142,10 @@ Firstly,we analyze the correlaytion coeffient between $Y$ and numerical variable
 			\includegraphics[width=1\textwidth,height=0.3\textheight]{scatter_plot_length.png} \\
 		\end{minipage}
 	}
-\caption{Scatter plots by different numerical variables}
+\caption{Scatter plots of different numerical variables}
 \end{figure}
 \subsection{Five Number Summary}
+Five statistics numbers give a brief review of basic information on our dataset. As shown in the table below, differences exist between varied categories, which suggests categorical variables are supposed to be included in the target model.
  \begin{table}[H]
 	\centering
 	\begin{tabular}{ccccccc}
@@ -159,7 +159,7 @@ Firstly,we analyze the correlaytion coeffient between $Y$ and numerical variable
         
 		\midrule[1.5pt]
 	\end{tabular}
-	\caption{A summary table for the variables }
+	\caption{Five number table of Region }
 \end{table}
  \begin{table}[H]
 	\centering
@@ -171,28 +171,30 @@ Firstly,we analyze the correlaytion coeffient between $Y$ and numerical variable
      Y    &2.900     & 4.500    & 5.000    &5.094       &5.700    &7.700\\
 		\midrule[1.5pt]
 	\end{tabular}
-	\caption{A summary table for the variables }
+	\caption{Five number table of Medschool}
 \end{table}
 
 \section{Data Preparation}
+Outliers are inevitable in any dataset, which have an effect on outcomes of coefficients and prediction. R is able to find and remove these values.
 \subsection{Boxplots}
-According to the Boxplot by different catogorical, we find there exists some outliers in the dataset.
+Outliers are apparent to pick out according to boxplots below.
 \begin{figure}[H]
 	\centering
-	\subfigure[the first subfigure]{
+	\subfigure[Boxplot by Meddschool]{
 		\begin{minipage}[b]{0.43\textwidth}
 			\includegraphics[width=1\textwidth]{group_boxplot_medschool.png} \\
 		\end{minipage}
 	}
-	\subfigure[the second subfigure]{
+	\subfigure[Boxplot by Region]{
 		\begin{minipage}[b]{0.43\textwidth}
 			\includegraphics[width=1\textwidth]{group_boxplot_region.png} \\
 		\end{minipage}
 	}
+	\caption{Boxplots by different categorical variables}
 \end{figure}
 
 \subsection{Remove Outliers}
-The outliers are shown in the following table. We remove 10 outliers and the ratio of the full dataset is 8.850\%.
+We removed 10 outliers, the ratio of which to the number of samples in the whole dataset is 8.850\%, thus would not affect the dataset too much. Outliers are shown in the following table.
  \begin{table}[H]
 	\centering
 	\begin{tabular}{ccccccc}
@@ -212,26 +214,26 @@ The outliers are shown in the following table. We remove 10 outliers and the rat
 	    112  &17.94  &  5.9    &26.4 &835         &Y     &NE\\
 		\midrule[1.5pt]
 	\end{tabular}
-	\caption{The information of outliers }
+	\caption{Detailed information of outliers }
 \end{table}
 \section{Model Fitting}
-\subsection{Using A.I.C \& B.I.C}
-Based on the criatia of A.I.C or B.I.C, the ``correct" model can be found. \par
-Without considering the interaction term, we find that the full model has the lowest A.I.C. based on the all subsets of the full model.The model we build is
+\subsection{Model Selection}
+The ``correct" model can be found based on the criatia of A.I.C or B.I.C. R gives us two candidate models without considering any interaction term.\par 
+We found that the full model has the lowest A.I.C. compared to all subset models. Therefore, the first model we built is
 \begin{equation}
 \begin{split}
 \hat{y_1}= &-0.4536+0.3962X_1+0.0586X_2+0.0013X_3-0.4005X_{4Y}\\ &-0.4577X_{5NE}-0.3619X_{5S}+0.9163X_{5W}
 \end{split}
 \end{equation} \par
-Without considering the interaction term, we find that the full model has the lowest B.I.C. based on the all subsets of the full model.The model we build is
+We also found that the model with the lowest B.I.C. compared to all other models. Therefore, the second model we built is
 \begin{equation}
 \begin{split}
 \hat{y_2}= &-0.5573+0.4389X_1+0.0565X_2\\&-0.5097X_{5NE}     -0.3471X_{5S}+0.9048X_{5W} 
 \end{split}
 \end{equation}
-There are some differences between the two models, we will use some techniques to compare them.
+Because A.I.C usually provides us with a larger "correct" model while B.I.C usually favors the "smaller" one, we were able to find our final model somewhere between the first model based on A.I.C and the second model based on B.I.C. Using some techniques to compare different models is of great necessity, as what we did in the next.
 \subsection{C.I. \& H.T. for $\beta_i$}
-We analyze the full model's $\beta s$ C.I.($\alpha=0.5$) for the first model. The table is as following.
+Because the first model is larger than the second one, at the same time, a ``correct" model is needed in the end. By analyzing C.I. and H.T. of $\beta$s, we could decide whether we should drop some variables from the first model.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{ccc}
@@ -250,12 +252,12 @@ We analyze the full model's $\beta s$ C.I.($\alpha=0.5$) for the first model. Th
 	\end{tabular}
 	\caption{C.I. of $\beta s$ of the first model }
 \end{table}
-The C.I. of $X_4$ contains 0. We will consider that $X_4$ should be dropped. 
+We were considering to drop $X_4$ at this moment since confidence intervals containing 0 do not suggest a significant relationship with the response variable $Y$. Though indicate variables like $X_{5NE}$ and $X_{5S}$ contain 0 as well, we could not drop $X_5$ from the first model because $X_{5W}$ does not contain 0 and suggests a strong relationship with $Y$.
 \begin{table}[H]
 	\centering
 	\begin{tabular}{ccccc}
 		\midrule[1.5pt]	
-		&Coefficients:
+		&Coefficients
 		&Estimate Std. Error &$t$ value &Pr($>|t|$)\\
 		\hline    
 	  (Intercept) &-0.453605 &  0.678888 & -0.6680 &0.50565    \\
@@ -270,92 +272,173 @@ The C.I. of $X_4$ contains 0. We will consider that $X_4$ should be dropped.
 	\end{tabular}
 	\caption{H.T. for $\beta s$ of the first model }
 \end{table}
-The p-value of $\beta_4$ is big enough for us to accept $H_0$ which means $\beta_4=0$, we can drop $X_4$. Now we have a model `` $Y~X_1,X_2,X_3,X_5$". We find that $\beta_3's$ value is quite small. How much error we will reduce by adding $X_3$ in our model ``$Y\sim X_1,X_2,X_5$" ?  
+The p-value of $\beta_4$ is big enough for us to accept $H_0$ which means $\beta_4=0$, so we could drop $X_4$. Now we have a new candidate model `` $Y \sim X_1,X_2,X_3,X_5$" and dismiss the full one.
 \subsection{Partial $R^2$}
-We use partial $R^2$ to estimate how much error we will reduce by adding $X_3$.
+We found that the value of $\beta_3$ is quite small. We used partial $R^2$ to estimate how much error we could reduce by adding $X_3$ to our second model ``$Y\sim X_1,X_2,X_5$". If partial $R^2$ is small, we would consider dropping $X_3$.
 \begin{equation}
-R^2=\frac{SSE_{S}-SSE_{L}}{SSE_{S}}=3.156\%
+R^2\{X_1,X_2,X_3,X_5|X_1,X_2,X_5\}=\frac{SSE_{S}-SSE_{L}}{SSE_{S}}=3.156\%
 \end{equation}
-Our goal is to find a ``correct" model, so we can drop $X_3$ and choose the second model $Y\sim X_1,X_2,X_5$ which is the best under the B.I.C criteria.
-\subsection{Add Interavtion Term}
-At last we consider that wether we should add the interaction term analyzing the C.I. of $\beta s$, we find there is no need to add interaction term, because the C.I. all contain 0.
-\subsection{Model Selection}
-Based on the discussion above, we find the most important variables $X_1,X_2,X_5$ and our final model is that
-\begin{equation}
-\begin{split}
-Y\sim X_1+X_2+X_5
-\end{split}
-\end{equation}
-\section{Model Diagnotics}
-There are some assumptions we should obey by using linear regression. Mostly, we care about the normality of $e_i$ and whether the variance is a constant.
+$R^2\{X_1,X_2,X_3,X_5|X_1,X_2,X_5\}$ is not large enough to overweigh the additional cost a large model will bring about. Besides, considering  the correlation coefficient between $X_3$ and $Y$ and the scatter plot of $X_3$ and $Y$ in section 2.2 only suggests a weak relationship,  we dropped $X_3$ and chose the second model ``$Y\sim X_1,X_2,X_5$" temporarily as our final model.
+\subsection{Add Interaction Terms}
+At last, to figure out whether interaction terms should be added, we analyzed the C.I. of $\beta$s of relavant interaction terms and found that there was no need to add these terms because the C.I. all contain 0.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ccc}
+		\midrule[1.5pt]	
+						&2.5 \% &97.5\% \\
+		\hline    
+		(Intercept) &-2.2187 &3.2553\\
+		$X_1$           &0.0451 &0.6108\\
+		$X_2$           &0.0336 &0.0778\\
+		$X_{5NE}$        &-5.7841 &1.3486\\
+		$X_{5S}$         &-5.6676 &1.3708\\
+		$X_{5W}$         &-2.3968 &7.2876\\
+		$X_1:X_{5NE}$     &-0.1829 &0.5292\\
+		$X_1:X_{5S}$      &-0.1798 &0.5627\\
+		$X_1:X_{5W}$      &-0.7801 &0.3557\\
+		\midrule[1.5pt]
+	\end{tabular}
+	\caption{H.T. for $\beta s$ of interaction terms with $X_1$ }
+\end{table}
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ccc}
+		\midrule[1.5pt]	
+		&2.5 \% &97.5\% \\
+		\hline    
+		(Intercept) &-1.5605  &1.3035\\
+		$X_1$          &0.2868  &0.5552\\
+		$X_2$          &-0.00532  &0.0815\\
+		$X_{5NE}$        &-1.7807  &0.4531\\
+		$X_{5S}$         &-1.8586 &-0.1378\\
+		$X_{5W}$        & 0.1689  &2.6083\\
+		$X_2:X_{5NE}$     &-0.0452  &0.0732\\
+		$X_2:X_{5S}$      &-0.0068 &0.1038\\
+		$X_2:X_{5W}$      &-0.1208  &0.0405\\
+		\midrule[1.5pt]
+	\end{tabular}
+	\caption{H.T. for $\beta s$ of interaction terms with $X_2$ }
+\end{table}
+\subsection{Final Model}
+Based on the discussion above, we have found the most important variables $X_1,X_2,X_5$ and reached our final model ``$Y\sim X_1+X_2+X_5$".
+
+\section{Model Diagnostics}
+There are a few assumptions we have to obey when using linear regression. Mostly, we care about the normality of $e_i$ and whether the variance is constant.
+\begin{figure}[htbp]
+	\centering
+	\subfigure[Normal qqplot]{
+		\begin{minipage}[b]{0.43\textwidth}
+			\includegraphics[width=1\textwidth,height=0.25\textheight]{qqplot.jpg} \\
+		\end{minipage}
+	}
+	\subfigure[$e_i$ v.s. $\hat{y_i}$ plot]{
+		\begin{minipage}[b]{0.43\textwidth}
+			\includegraphics[width=1\textwidth]{scatter_plot_constant_variance.png} \\
+		\end{minipage}
+	}
+	\caption{Plots of model diagnostics}
+\end{figure}
 \subsection{$e_i$ Normality}
-The assumption is that $\varepsilon\sim \mathcal N(0,\sigma_{\varepsilon})$. We use $e_i$ to estimate $\varepsilon$ in practice. There are two popular ways which are QQ plot and Shapiro-Wilk Normality Test.
+The assumption is that $\varepsilon\sim \mathcal N(0,\sigma_{\varepsilon})$ in linear regression. We use $e_i$ to estimate $\varepsilon$ in practice. There are two popular ways to verify this assumption, which are QQ plot and Shapiro-Wilk Normality Test.
 \subsubsection{QQ Plot}
-Accoding to the figure below, most points are near to $y=x$ which suggests $e_i$ is normarly distributed.
- \begin{figure}[H]
-	\centering
-	\includegraphics[width=.65\textwidth,height=.35\textheight]{qqplot.png} %1.png是图片文件的相对路径
-	\caption{best} %caption是图片的标题
-\end{figure}
+Accoding to the figure in Figure3(a), except several deviations, most points are near the expected line $y=x$, which suggests $e_i$ is normally distributed.
+% \begin{figure}[H]
+%	\centering
+%	\includegraphics[width=.60\textwidth,height=.30\textheight]{qqplot.jpg}
+%	\caption{Normal qqplot}
+%\end{figure}
 \subsubsection{Shapiro-Wilk Normality Test}
-We use Shapiro-Wilk Test to find whether the error is normaly distributed.
+We also used Shapiro-Wilk Test to find whether the error is normaly distributed at a given significance.
 \begin{itemize}
-	\item $H_0$: The error is normaly distributed.
-	\item $H_A$: The error is not normaly distributed.
+	\item $H_0$: The error is normally distributed.
+	\item $H_A$: The error is not normally distributed.
 \end{itemize}
-Accoding to R, the p-value=0.5181. Is is large enough for us to accept null which
-means the error is normaly distributed under any significance.
+Accoding to R, the p-value of S-W test statistics is 0.5181. It is large enough for us to accept the null hypothesis, which
+means the error is normally distributed under any significance we usually use.
 \subsubsection{Conclusion}
-Our model obey the assumption that $\varepsilon\sim \mathcal N(0,\sigma_{\varepsilon})$.  
+Our final model obeys the assumption $\varepsilon\sim \mathcal N(0,\sigma_{\varepsilon})$.  
 \subsection{Constant Variance}
-The assumption is that $\sigma_{\varepsilon}$ is constant. There are two popular ways which are plotting $e_i v.s. \hat{y_i}$ and Fligner-Killeen  Test.
+The assumption is that $\sigma_{\varepsilon}$ is constant in linear regression. There are two popular ways to verify this assumption, which are plotting $e_i v.s. \hat{y_i}$ and Fligner-Killeen  Test.
 \subsubsection{$e_i$ v.s. $\hat{y_i}$ Plot}
-Accoding to the figure below , there is no clear pattern in the plot, so the conclusion is that the variance is constant.
- \begin{figure}[H]
-	\centering
-	\includegraphics[width=.65\textwidth,height=.30\textheight]{scatter_plot_constant_variance.png} %1.png是图片文件的相对路径
-	\caption{best} %caption是图片的标题
-	\label{img} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
-\end{figure}
+Accoding to the figure in Figure3(b), there is similar pattern vertical spread across the plot, so we concluded that the variance is constant.
+% \begin{figure}[H]
+%	\centering
+%	\includegraphics[width=.60\textwidth,height=.30\textheight]{scatter_plot_constant_variance.png} %1.png是图片文件的相对路径
+%	\caption{$e_i$ v.s. $\hat{y_i}$} %caption是图片的标题
+%	\label{img} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
+%\end{figure}
 \subsubsection{Fligner-Killeen  Test}
-We use Fligner-Killeen Test to find whether the variance is constant.
+We used Fligner-Killeen Test to find whether the variance is constant.
 \begin{itemize}
-	\item $H_0$: $\sigma^2_{lower}=\sigma^2_{higher}$.
-	\item $H_A$: $\sigma^2_{lower}\neq\sigma^2_{higher}$.
+	\item $H_0$: $\sigma^2_{lower}=\sigma^2_{upper}$.
+	\item $H_A$: $\sigma^2_{lower}\neq\sigma^2_{upper}$.
 \end{itemize}
-Accoding to R, the p-value=0.2361. Is is large enough for us to accept null which
-means the variance is constant under any significance.
+Accoding to R, the p-value of F-K test statistics is 0.2361. It is large enough for us to accept the null hypothesis, which
+means the variance is constant under any significance we usually use.
 \subsubsection{Conclusion}
-The conclusion is that our model obey the assumption that the variance is constant.
+Our final model obeys the assumption that the variance is constant.
 \subsection{Remove  Outliers Again}
-We use the method of ``Cooks Distance" to find wether there still exists some outliers in the dataset. As shown in the figure below, The ``Cooks Distance" is so small that there is no need to move any points out of our dataset.
+We used the method ``Cooks Distance" to find whether there are still some outliers in the dataset. As shown in the figure below, The ``Cooks Distance" is so small (less than the frequently used cutoff = 0.50) that there is no need to remove any points out of the current dataset.
  \begin{figure}[H]
 	\centering
-	\includegraphics[width=.65\textwidth,height=.35\textheight]{cooks_distance.png} %1.png是图片文件的相对路径
-	\caption{best} %caption是图片的标题
+	\includegraphics[width=.60\textwidth,height=.30\textheight]{cooks_distance.png} %1.png是图片文件的相对路径
+	\caption{cook's distance} %caption是图片的标题
 	\label{img} %此处的label相当于一个图片的专属标志，目的是方便上下文的引用
 \end{figure}
 \subsection{Final model}
-Our final model is a ``correct"" model and it is appropriate.
+Our final model is a ``correct"" model and it is appropriate, obeying linear regression assumptions, and there's no need to include interaction terms.
 \begin{equation}
 \begin{split}
 Y= &-0.5573+0.4389X_1+0.0565X_2-0.5097X_{5NE}\\&-0.3471X_{5S}+0.9048X_{5W} +\varepsilon
 \end{split}
 \end{equation}
+\par
+This model can be written to four parallel lines due to the categorical variable $X_5$ and no interaction terms.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{cc}
+		\midrule[1.5pt]	
+		Category& Linear Regression function\\
+		\hline    
+		North Central&$\hat{y}=-0.5573+0.4389X_1+0.0565X_2$\\
+		North East&$\hat{y}=-1.0670+0.4389X_1+0.0565X_2$\\
+		South&$\hat{y}=-0.9044+0.4389X_1+0.0565X_2$\\
+		West&$\hat{y}=0.3475+0.4389X_1+0.0565X_2$\\
+		\midrule[1.5pt]
+	\end{tabular}
+	\caption{Linear regression function for different regions}
+\end{table}
+
 \section{Interpretation}
-In this section, we will interpret the meaning of $\beta s$ according to this problem.
+In this section, the meaning of every single $\beta$ is interpreted according to this problem.
 \begin{itemize}
 	\item $\beta_{0}$: Since the probability of acquring infection in hospital cannot be negative, it is inappropriate to predict the probability of acquiring infection at all $X$'s equal 0.
 	\item $\beta_1$: When the length of stay of all patients in the hospital increases by 1 day, the probability of acquring infection in hospital tends to increase by 0.4389 percentage on average, holding all other variables constant.
 	\item $\beta_2$: When the ratio of number of cultures performed to number of patients increases by 1, the probability of acquring infection in hospital tends to increase by 0.05648 percentage on average, holding all other variables constant.
 	\item $\beta_{3}$: The probability of acquring infection in hospital tends to decrease by 0.5097 percentage on average when patients are in category of North East compared to patients in category of North Central, holding all other variables constant.
 	\item $\beta_{4}$: The probability of acquiring infection in hospital tends to decrease by 0.3471 percentage on average when patients are in category of South compared to patients in category of North Central, holding all other variables constant.
-	\item $\beta_{5}$: bThe probability of acquiring infection in hospital tends to increase by 0.9048 percentage on average when patients are in category of West compared to patients in category of North Central, holding all other variables constant.
+	\item $\beta_{5}$: The probability of acquiring infection in hospital tends to increase by 0.9048 percentage on average when patients are in category of West compared to patients in category of North Central, holding all other variables constant.
 	
 \end{itemize}
 \section{Prediction}
-We will use our model to do a prediction.b
+We used our final model to answer this question, 
+``Predict the probability of infection in hospital with Stay=8, Culture=14, Region=`W'. "
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ccc}
+		\midrule[1.5pt]	
+		&point estimate &prediction intervals\\
+		\hline
+		$\bar{y}^{*}$&4.6493 	&[4.2042, 5.0945]\\
+		$y^{*}$&4.6493			&[2.9272, 6.3715]\\
+		\midrule[1.5pt]
+	\end{tabular}
+	\caption{Estimated value of Infect for $x^{*}$}
+\end{table}
 \section{Conclusion}
+We have found that the average length of stay of all patients in the hospital($X_1$), the ratio of number of cultures performed to number of patients($X_2$) and geographical region($X_5$) have the most important effect on the prabability of acquiring infection in hospital.
+\newpage
 \section*{R Appendix}				
 \begin{lstlisting}[language=R,caption={R script for Project 1}] 
 ##### set work directory and load dataset ##### 

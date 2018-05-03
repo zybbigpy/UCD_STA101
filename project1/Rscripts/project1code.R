@@ -1,5 +1,5 @@
 ##### set work directory and load dataset ##### 
-setwd("/home/xmy/STA 101/Projects/P1")
+setwd("D:\\UCD_STA101\\project1\\Rscripts")
 HospFull<-read.csv("HospFull.csv", header = TRUE)
 head(HospFull, n = 3)
 
