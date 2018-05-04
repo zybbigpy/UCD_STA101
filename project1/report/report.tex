@@ -281,6 +281,46 @@ R^2\{X_1,X_2,X_3,X_5|X_1,X_2,X_5\}=\frac{SSE_{S}-SSE_{L}}{SSE_{S}}=3.156\%
 $R^2\{X_1,X_2,X_3,X_5|X_1,X_2,X_5\}$ is not large enough to overweigh the additional cost a large model will bring about. Besides, considering  the correlation coefficient between $X_3$ and $Y$ and the scatter plot of $X_3$ and $Y$ in section 2.2 only suggests a weak relationship,  we dropped $X_3$ and chose the second model ``$Y\sim X_1,X_2,X_5$" temporarily as our final model.
 \subsection{Add Interaction Terms}
 At last, to figure out whether interaction terms should be added, we analyzed the C.I. of $\beta$s of relavant interaction terms and found that there was no need to add these terms because the C.I. all contain 0.
+\begin{minipage}{\textwidth}
+	\begin{minipage}[t]{0.45\textwidth}
+		\centering
+		\makeatletter\def\@captype{table}\makeatother\caption{表格标题1}
+		\begin{tabular}{ccc}
+		\midrule[1.5pt]	
+		&2.5 \% &97.5\% \\
+		\hline    
+		(Intercept) &-2.2187 &3.2553\\
+		$X_1$           &0.0451 &0.6108\\
+		$X_2$           &0.0336 &0.0778\\
+		$X_{5NE}$        &-5.7841 &1.3486\\
+		$X_{5S}$         &-5.6676 &1.3708\\
+		$X_{5W}$         &-2.3968 &7.2876\\
+		$X_1:X_{5NE}$     &-0.1829 &0.5292\\
+		$X_1:X_{5S}$      &-0.1798 &0.5627\\
+		$X_1:X_{5W}$      &-0.7801 &0.3557\\
+		\midrule[1.5pt]
+	   \end{tabular}
+	\end{minipage}
+	\begin{minipage}[t]{0.45\textwidth}
+		\centering
+		\makeatletter\def\@captype{table}\makeatother\caption{表格标题2}
+		\begin{tabular}{ccc}
+			\midrule[1.5pt]	
+			&2.5 \% &97.5\% \\
+			\hline    
+			(Intercept) &-1.5605  &1.3035\\
+			$X_1$          &0.2868  &0.5552\\
+			$X_2$          &-0.00532  &0.0815\\
+			$X_{5NE}$        &-1.7807  &0.4531\\
+			$X_{5S}$         &-1.8586 &-0.1378\\
+			$X_{5W}$        & 0.1689  &2.6083\\
+			$X_2:X_{5NE}$     &-0.0452  &0.0732\\
+			$X_2:X_{5S}$      &-0.0068 &0.1038\\
+			$X_2:X_{5W}$      &-0.1208  &0.0405\\
+			\midrule[1.5pt]
+		\end{tabular}
+	\end{minipage}
+\end{minipage}
 \begin{table}[H]
 	\centering
 	\begin{tabular}{ccc}
