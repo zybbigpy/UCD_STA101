@@ -1,0 +1,310 @@
+---
+title: "HW4"
+author: "Wangqian Miao"
+output: html_document
+---
+
+```{r,echo=FALSE}
+alcohol = read.csv("alcohol.csv")
+CHD = read.csv("CHD.csv")
+flu = read.csv("flu.csv")
+```
+```{r,warning=FALSE,echo=FALSE}
+library(ggplot2)
+library(pROC)
+library(EnvStats)
+```
+
+### Problem 1
+**(a)**
+
+```{r, echo = FALSE}
+the.model=lm(BAC~BrAC,data=alcohol)
+LY = boxcox(alcohol$BAC, objective.name = "Log-Likelihood", optimize = TRUE)$lambda
+YT = (alcohol$BAC^LY - 1)/LY
+t.data = data.frame(Y = YT, X = alcohol$BrAC)
+qplot(X, Y, data = t.data) + ggtitle("BAC after transformation v.s. BrAC") + xlab("BrAC") + ylab("BAC after transformation")
+```
+
+The method I use is loglikelihood. The value of $\lambda$ is `r LY`.
+
+**(b)**
+```{r, echo = FALSE}
+the.model = lm(Y~X, data = t.data)
+Group = rep("Lower", nrow(t.data))
+Group[t.data$Y < median(t.data$Y)] = "Upper"
+Group = as.factor(Group)
+t.data$Group = Group
+t.data$ei = the.model$residuals
+t.data$yhat = the.model$fitted.values
+the.FKtest = fligner.test(t.data$ei, t.data$Group)
+the.FKtest
+```
+I use F-K test to test whether the variance is constant.  
+$H_{0}: \sigma^{2}_{lower}=\sigma^{2}_{upper}$. 
+$H_{0}: \sigma^{2}_{lower}\neq\sigma^{2}_{upper}$.  
+
+P-value is $0.2021>\alpha=0.05$, we fail to reject $H_{0}$ and the conclusion is that the variance is constant at $95\%$ significance.
+
+
+**(c)**
+
+```{r, echo = FALSE}
+LY = boxcox(alcohol$BAC, objective.name = "Log-Likelihood", optimize = TRUE)$lambda
+YT = (alcohol$BAC^LY - 1)/LY
+LX = boxcox(alcohol$BrAC, objective.name = "Log-Likelihood", optimize = TRUE)$lambda
+XT = (alcohol$BrAC^LX - 1)/LX
+t2.data = data.frame(Y = YT, X = XT)
+qplot(XT, YT, data = t2.data) + ggtitle("BAC after transformation v.s. BrAC after transformation") + xlab("BrAC after transformation") + ylab("BAC after transformation")
+```
+
+**(d)**
+```{r, echo = FALSE}
+the.model = lm(Y~X, data = t2.data)
+ei = the.model$residuals
+t2.data$ei = the.model$residuals
+t2.data$yhat = the.model$fitted.values
+the.SWtest = shapiro.test(ei)
+the.SWtest
+
+Group = rep("Lower", nrow(t2.data))
+Group[t2.data$Y < median(t2.data$Y)] = "Upper"
+Group = as.factor(Group)
+t2.data$Group = Group
+the.FKtest = fligner.test(t2.data$ei, t2.data$Group)
+the.FKtest
+```
+
+S-W test:  
+$H_{0}$:The data is normally distributed.  
+$H_{A}$:The data is not normally distributed.  
+P-value is $0.005283<\alpha=0.01$, we will reject $H_{0}$. I conclude that the data is not normally distributed.  
+
+F-K test:  
+$H_{0}:\sigma^{2}_{lower}=\sigma^{2}_{upper}$  
+$H_{A}:\sigma^{2}_{lower}\neq\sigma^{2}_{upper}$  
+Conclusion:  
+P-value is $0.1781>\alpha=0.05$, we fail to reject $H_{0}$ and conclude that the variance is constant.
+
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+I woud suggest transformation only for Y. Accoding to the p-value of F-K test for dataset with transformed BAC is larger than that for dataset with transformed BrAC and BAC. 
+
+### Problem 2
+**(a)**
+
+```{r, echo = FALSE}
+the.logit = glm(shot~age + aware + gender, data = flu, family = binomial(link = logit))
+the.betas = the.logit$coefficients
+the.betas
+exp.betas = exp(the.betas)
+names(exp.betas) = c("(Intercept)", "exp.age", "exp.aware", "exp.genderM")
+exp.betas
+alpha = 0.1
+the.CI = confint(the.logit, level = 1 - alpha)
+the.CI
+exp.CI = exp(the.CI)
+rownames(exp.CI) = c("(Intercept)", "exp.age", "exp.aware", "exp.genderM")
+exp.CI
+```
+The estimated logistic-regression function : $\ln \frac{\hat{\pi}}{1-\hat{\pi}} = `r round(the.betas[1], 4)` + `r round(the.betas[2], 4)`X_{1} `r round(the.betas[3], 4)`X_{2} + `r round(the.betas[4], 4)`X_{M}$. ($X_1$=age, $X_2$=aware)
+
+
+**(b)**
+```{r, echo = FALSE}
+x.star = data.frame(age = 55, aware = 70, gender = "M")
+the.predict = predict(the.logit, x.star, type = "response")
+the.predict
+```
+The estimated probability for a 55-year-old female to get flu with an awareness score of 70 is `r round(the.predict, 4)` .
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+Because $\beta_{1} = `r round(the.betas[2], 4)`$, the probability of a flu shot goes up as your age increases.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+When age increases by 1 year, the odds of flu shot will be `r round(exp.betas[2], 4)` times that of what it was holding other variables constant.
+
+**(e)**
+
+The $90\%$ C.I. for $\exp{\hat{\beta_1}}$ is [`r exp.CI[2,]`]. When age increases by 1 year, we are $90\%$ in confidence that the odds of flu shot will be between `r round(exp.CI[2,1], 4)` times and `r round(exp.CI[2,2], 4)` times as what it was holding other variables constant.
+
+**(f)**
+
+The odds of flu shot for Male is `r round(exp.betas[4], 4)` times the odds for Female holding all other variables as constant.
+
+**(g)**
+
+The $90\%$ C.I. for $\exp{\hat{\beta_3}}$ is [`r exp.CI[4,]`]. We are $90\%$ in confidence that the odds of flu shot will be between `r round(exp.CI[4,1], 4)` times and `r round(exp.CI[4,2], 4)` times the odds for Female holding other variables constant.
+
+### Problem 3
+**(a)**
+```{r, echo = FALSE}
+
+```
+There is no meaning for interpreting $\beta_0$. $\exp(\beta_{0})$ represents the odds of a female patient who is 0 year old and has no awareness of health which is meaningless.
+
+**(b)**
+```{r, echo = FALSE}
+max=max(flu$age)
+min=min(flu$age)
+```
+The age in the dataset is range from [`r min`,`r max`]. So, it is not appropriate to predict someone aged 12.
+
+**(c)**
+```{r, echo = FALSE}
+pi.0 = 0.50
+truth = flu$shot
+predicted = ifelse(fitted(the.logit)>pi.0, 1, 0)
+the.table = table(truth, predicted)
+sens = sum(predicted ==1 & truth == 1)/sum(truth == 0)
+spec = sum(predicted ==0 & truth == 0)/sum(truth == 0)
+error = sum(predicted != truth)/length(predicted)
+results = c(sens, spec, error)
+names(results) = c("Sensitivity", "Specificity", "Error Rate")
+round(results, 4)
+```
+
+**(d)**
+```{r, echo = FALSE}
+the.auc = auc(flu$shot, fitted(the.logit), plot = TRUE)
+the.auc
+auc.CI = ci(the.auc, level = 1-0.05)
+auc.CI
+```
+
+AUC is `r round(the.auc, 4)`. The $95\%$ confident interval for AUC is [`r round(auc.CI[1], 4)`,`r round(auc.CI[3], 4)`]. It does not contain 0.5 which means our model predicts the response variable very well. 
+
+### Problem 4
+**(a)**
+```{r, echo = FALSE}
+the.logit = glm(CHD~AGE, data = CHD, family = binomial(link = logit))
+the.betas = the.logit$coefficients
+the.betas
+exp.betas = exp(the.betas)
+names(exp.betas) = c("(Intercept)", "exp.AGE")
+alpha = 0.01
+the.CI = confint(the.logit, level = 1 - alpha)
+exp.CI = exp(the.CI)
+rownames(exp.CI) = c("(Intercept)", "exp.AGE")
+exp.betas
+exp.CI
+```
+
+The estimated logistic-regression function : $\ln \frac{\hat{\pi}}{1-\hat{\pi}} = `r round(the.betas[1], 4)` + `r round(the.betas[2], 4)`X_{1}$.
+
+**(b)**
+```{r, echo = FALSE}
+x.star = data.frame(AGE = 69)
+the.predict = predict(the.logit, x.star, type = "response")
+```
+
+The estimated probability for a 69 year old person to have CHD is `r round(the.predict, 4)`.
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+
+The probability of CHD goes up as your age increases beacause $\beta_1 = 0.1109$ which is larger than 1.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+
+When the age increases by one year, the odds of CHD tends to be  `r round(exp.betas[2], 4)` times what is was holding other variables constant. 
+
+**(e)**
+
+The $99\%$ C.I. for $\exp{\hat{\beta_1}}$ is [`r exp.CI[2,]`]. We are $99\%$ in confidence that the odds of CHD will be between `r round(exp.CI[2,1], 4)` times and `r round(exp.CI[2,2], 4)` times the odds for Female holding other variables constant.
+
+### Problem 5
+**(a)**
+
+```{r, echo = FALSE}
+the.logit = glm(CHD~AGE, data = CHD, family = binomial(link = logit))
+plot(CHD$AGE, the.logit$fitted.values)
+curve(predict(the.logit, data.frame(AGE=x), type = "response"), add = TRUE)
+```
+
+AGE does not seem to have a large effect on the probability of CHD because variance in slope is not too large when AGE varies, 
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+$\exp({\beta_{0}})$ represents the odds of CHD for a 0 year old, so $\exp({\beta_{0})}$ does not have a praticle meaning because nobody can be 0 year old.
+
+**(c)**
+```{r, echo = FALSE}
+```
+I think it makes sense to predict CHD for someone aged 44. Because according to the dataset the age is range from `r min(CHD$AGE)` to `r max(CHD$AGE)`.
+
+**(d)**
+
+```{r, echo = FALSE}
+pi.0 = 0.50
+truth = CHD$CHD
+predicted = ifelse(fitted(the.logit)>pi.0, 1, 0)
+the.table = table(truth, predicted)
+sens = sum(predicted ==1 & truth == 1)/sum(truth == 0)
+spec = sum(predicted ==0 & truth == 0)/sum(truth == 0)
+error = sum(predicted != truth)/length(predicted)
+results = c(sens, spec, error)
+names(results) = c("Sensitivity", "Specificity", "Error Rate")
+round(results, 4)
+```
+
+**(e)**
+```{r, echo = FALSE}
+the.auc = auc(CHD$CHD, fitted(the.logit), plot = TRUE)
+the.auc
+auc.CI = ci(the.auc, level = 1-0.05)
+auc.CI
+```
+AUC is `r round(the.auc, 4)`. The $95\%$ confident interval for AUC is [`r round(auc.CI[1], 4)`,`r round(auc.CI[3], 4)`]. The C.I. does not contain 0.5 which suggests our model predicts $Y$ well. 
+
+### Problem 6
+**(a)**
+```{r, echo = FALSE}
+
+```
+True.  
+When $\exp({\beta_{1}})$ contains 1 which means $\beta_{1}$ contains 0. We can conclude $X_{1}$ has no influence on the odds of $Y=1$.
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+False.
+$\exp(\beta_1)$ gives us when $X_1$ increases 1 unit, how much odds will be times the old one.
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+False.  
+It just depends on whether it is meaningful to set all $X_i$ equals 0.
+
+**(d)**
+```{r, echo = FALSE}
+
+``` 
+True.  
+We accept $H_{0}: \beta_{1} = 0$ which means $X_{1}$ does not affect the odds of trait($Y=1$).
+
+
+
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+
