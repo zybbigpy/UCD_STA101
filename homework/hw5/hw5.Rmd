@@ -1,0 +1,351 @@
+---
+title: "STA101 - HW 5"
+author: "Wangqian Miao"
+output: html_document
+---
+
+### Problem 1
+**(a)**
+```{r, echo = FALSE}
+flu=read.csv("flu.csv",header = TRUE)
+head(flu)
+empty.model=glm(shot~1,data=flu,family = binomial(link=logit))
+full.model=glm(shot~.,data=flu,family=binomial(link = logit))
+step(empty.model,scope = list(lower = empty.model, upper = full.model),direction = "forward")
+```
+$X_1$ and $X_2$ are included in the final model.
+
+**(b)**
+```{r, echo = FALSE}
+step(full.model,scope = list(lower = empty.model, upper = full.model),direction = "backward")
+```
+
+$X_1$ and $X_2$ are included in the final model.
+
+**(c)**
+```{r, echo = FALSE}
+model.a=glm(shot~aware+age,data=flu,family=binomial(link = logit))
+LLA=logLik(model.a)
+```
+The logistic regression model is:  
+$\ln\frac{\hat{\pi}}{1-\hat{\pi}}= -1.45778+0.07787X_1-0.09547X_2$. 
+This model's log-likelihood is `r LLA`.
+
+**(d)**
+```{r, echo = FALSE}
+model.b=glm(shot~aware+age+aware*age,data=flu,family=binomial(link = logit))
+LLB=logLik(model.b)
+#model.b$coefficients
+```
+The log-likelihood is `r LLB` after adding the iteraction term.
+
+**(e)**
+```{r,echo=FALSE}
+pa = length(model.a$coefficients)
+pb = length(model.b$coefficients)
+LR = -2*(LLA - LLB)
+p.value = pchisq(LR, df=pb-pa)
+```
+$H_0$: The model without interaction term is better.  
+$H_A$: The model with interaction term is better.  
+The Test statistic is LR =`r LR`. P-value is `r p.value`.
+
+**(f)**
+
+P-value is larger than 0.05 then we fail to reject null and and conclude that the interaction term should be dropped.
+
+### Problem 2
+**(a)**
+```{r, echo = FALSE}
+the.betas=model.a$coefficients
+exp.betas=exp(the.betas)
+exp.betas
+```
+
+The odds of getting a shot flu will be 1.081 times what is was when the age increases one year, holding other variables constant.
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+
+The odds of getting a shot flu will be 0.9089 times what is was when the health awareness score increases one unit, holding other variables constant.
+
+**(c)**
+```{r, echo = FALSE}
+x.star=data.frame(age=57,gender="M",aware=50)
+my.predict = predict(model.a,x.star,type = "response")
+my.predict
+
+```
+The estimated possibility for this person to get the flu is 0.1427, so the conclusion is that he would not get the flu.
+
+**(d)**
+```{r, echo = FALSE}
+library(LogisticDx)
+good.stuff = dx(model.a)
+pear.r = good.stuff$Pr #Pearsons Residuals
+std.r = good.stuff$sPr #Standardized residuals (Pearson)
+df.beta = good.stuff$dBhat #DF Beta for removing each observation
+change.pearson = good.stuff$dChisq #Change in pearson X^2 for each observation
+hist(std.r, main = "Pearson Standardized Residuals")
+cutoff.std = 4.0
+std.r[std.r > cutoff.std]
+good.stuff[std.r > cutoff.std]
+```
+There exists.
+
+**(e)**
+
+```{r, echo = FALSE}
+plot(df.beta,main = "Index plot of the change in the Betas")
+cutoff.beta = .30
+df.beta[df.beta > cutoff.beta] #Shows the values of df.Beta
+good.stuff[df.beta > cutoff.beta,]
+```
+As  shown in the table, there exists.
+
+### Problem 3
+**(a)**
+```{r, echo = FALSE}
+library(nnet)
+control=read.csv("control.csv",header = TRUE)
+head(control)
+full.model = multinom(con~ .,data = control,trace = FALSE)
+null.model = multinom(con ~ 1,data = control,trace = FALSE)
+forward.model = step(null.model, scope = list(lower = null.model, upper = full.model), direction = "forward",trace = FALSE)
+summary(forward.model)
+```
+$X_1$ and $X_2$ are included in this model.
+
+**(b)**
+```{r, echo = FALSE}
+library(nnet)
+full.model = multinom(con~ .,data = control,trace = FALSE)
+null.model = multinom(con ~ 1,data = control,trace = FALSE)
+backward.model = step(full.model, scope = list(lower = null.model, upper = full.model), direction = "backward",trace = FALSE)
+summary(backward.model)
+```
+$X_1$ and $X_2$ are included in the model.
+
+**(c)**
+```{r, echo = FALSE}
+summary(forward.model)
+```
+This gives us the following models for the two log-odds:
+$\ln\frac{\pi_{none}}{\pi_{Long}}=-1.031659-0.6054868X_{eduG}  -0.1114698X_{eduL} -0.3608938X_{eduM}+0.05140516X_1$.  
+$\ln\frac{\pi_{short}}{\pi_{Long}}= -3.683428+0.4272499X_{eduG} -10.6328484X_{eduL} -2.2720652X_{eduM}+ 0.10534161X_1$.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+The relative probability of bing birth control none vs birth control long is 1.0527 times what it was when the age increases one year.   
+
+**(e)**
+
+The relative probability of  bing birth control short vs birth control long for is 1.1111 times what it was when the age increases one year.  
+
+### Problem 4
+**(a)**
+```{r, echo = FALSE}
+
+```
+The relative probability of being no birth control vs long term birth control in Group G is 0.2494 times in Group M, holding age constant.
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+The relative probability of being short term birth control vs long term birth control in Group L is 2.6993 times in Group M, holding age constant.
+
+**(c)**
+```{r, echo = FALSE}
+model.0 = multinom(con~ age,data = control,trace = FALSE)
+model.a = multinom(con~ age+edu,data = control,trace = FALSE)
+LLA=logLik(model.a)
+LL0=logLik(model.0)
+#pA = length(model.a$coefficients)
+pA = length(coef(model.a))
+#p0 = length(model.0$coefficients)
+p0 = length(coef(model.0))
+LR = -2*(LL0 - LLA)
+p.value = pchisq(LR, df= pA-p0)
+LR
+p.value
+```
+
+$H_0$: $\beta_2=\beta_3=\beta_4=0$.  
+$H_A$: At least one $\beta_i\neq0, i=2,3,4$  
+The test statistics LR equals 56.371, p-value equals 1.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+p-value is large enough for us to fail to reject $H_0$. We can conclude that X2 can be dropped from the model.
+
+### Problem 5
+**(a)**
+```{r, echo = FALSE}
+spilt.data = split(control, control$con)
+names(spilt.data)
+LvsS=rbind(spilt.data[[1]], spilt.data[[3]])
+model.LvsS= glm(con ~ age + edu, data = LvsS, family = binomial(logit))
+summary(model.LvsS)
+```
+The model is $\ln\frac{\pi_{s}}{\pi_{l}}=-3.796+0.1064X_1+0.4583X_{eduG}-17.4359X_{eduL}-1.9400X_{eduM}$
+
+**(b)**
+
+```{r, echo = FALSE}
+library(LogisticDx)
+good.stuff = dx(model.LvsS)
+pear.r = good.stuff$Pr #Pearsons Residuals
+std.r = good.stuff$sPr #Standardized residuals (Pearson)
+df.beta = good.stuff$dBhat #DF Beta for removing each observation
+change.pearson = good.stuff$dChisq #Change in pearson X^2 for each observation
+hist(std.r, main = "Pearson Standardized Residuals")
+```
+
+There is no observations larger than 3 or smaller than -3.
+
+**(c)**
+```{r, echo = FALSE}
+plot(change.pearson,main = "Index plot of the change in the Pearson's test-statistic")
+cutoff.pearson = 8
+change.pearson[change.pearson > cutoff.pearson] #Shows the values
+good.stuff[change.pearson > cutoff.pearson] #Shows the values of my columns (colum names are specific to your dataset),and the values of the change in Pearson (which is called dChisq in original dataframe). 
+```
+
+There is no observation larger than 8.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+No observations should be removed because there is no outliers in standardized residuals and in test statistics, 
+
+### Problem 6
+**(a)**
+```{r, echo = FALSE}
+
+```
+FALSE 
+An influential point is not necessarily an outlier. It may be repeated rows in the dataset.
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+FALSE  
+They will have different $\beta s$ for all sub-models.
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+FALSE  
+When we reject null, we will conclude that a larger model is better.
+
+**(d)**
+```{r, echo = FALSE}
+
+```
+FALSE  
+The standarded residual is usual when it is between -3 and 3.
+
+### Problem 7
+**(a)**
+```{r, echo = FALSE}
+library(ggplot2)
+library(pROC)
+library(nnet)
+library(LogisticDx)
+library(asbio)
+rat=read.csv("rat.csv")
+group.means = by(rat$Weight, rat$Type, mean)
+group.sds = by(rat$Weight, rat$Type, sd)
+group.nis = by(rat$Weight, rat$Type, length)
+the.summary=rbind(group.means, group.sds, group.nis)
+the.summary = round(the.summary,digits=4)
+colnames(the.summary) = names(group.means)
+rownames(the.summary) = c("Means","Std. Dev","Sample size")
+the.summary
+```
+
+**(b)**
+
+```{r, echo = FALSE}
+plot(group.means,xaxt="n",pch=19,col="purple",xlab = "Type of food", ylab="Weight",main="Average weight change in rats by group", type="b")
+axis(1,1:length(group.means),names(group.means))
+boxplot(rat$Weight~rat$Type,main="Weight change in rats by group",ylab="Weight")
+```
+
+There seems to exist a difference between group Cereal and other groups.
+
+**(c)**
+```{r, echo = FALSE}
+
+```
+$H_0$: The smaller model fits better.
+$H_A$: The larger model fits better.
+The F-test is : $F_s=\frac{SSE_{s}-SSE_{L}}{d.f_{s}-d.f_{L}}/ \frac{SSE_{L}}{d.f_{L}}$
+
+**(d)**
+```{r, echo = FALSE}
+larger.model=lm(Weight~Type,data = rat)
+smaller.model=lm(Weight~1,data = rat)
+anova.table=anova(smaller.model, larger.model)
+anova.table
+```
+Test-statistic equals 0.4768. P-value equals 0.6232.  
+
+**(e)**
+The p-value is large enough and we fail to reject $H_0$, the conclusion is that smaller model is better and there is no significant difference in the mean of different group.
+
+### Problem 8
+**(a)**
+
+```{r, echo = FALSE}
+the.model = larger.model
+qqnorm(the.model$residuals)
+qqline(the.model$residuals)
+```
+
+The data seems approximately normal according to qq-plot.
+
+**(b)**
+```{r, echo = FALSE}
+sw.test = shapiro.test(the.model$residuals)
+sw.test
+```
+$H_0$: The data is normally distributed.  
+$H_A$: The data is not normally distributed.  
+The P-value of S-W test is 0.516. It is large enough and we fail to reject $H_0$ and conclude that the data is normally distributed.
+
+**(c)**
+
+```{r, echo = FALSE}
+plot(the.model$fitted.values,the.model$residuals, pch=19)
+abline(h=0,col="purple")
+```
+
+**(d)**
+```{r, echo = FALSE}
+ML.test = modlevene.test(the.model$residuals, rat$Type)
+ML.test
+```
+The p-value equals 0.8358. It is large enough and we will fail to reject $H_0$ and conclude that the variance between groups is constant.
+
+**(e)**
+
+According to the above problems, the assumptions of ANOVA are met.
+
+
+
+
+
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```
