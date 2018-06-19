@@ -1,0 +1,394 @@
+---
+title: "STA 101 - HW 7"
+author: "Wangqian Miao"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library('lme4')
+library(nlme)
+```
+
+### Problem 1
+**(a)**
+```{r, echo = FALSE}
+contact=read.csv("contact.csv")
+interaction.plot(contact$Eye,contact$Gen,contact$Rating)
+interaction.plot(contact$Gen,contact$Eye,contact$Rating)
+```
+There is no significant interaction from the plot.
+
+**(b)**
+```{r, echo = FALSE}
+names(contact) = c("Y","A","B")
+AB = lm(Y ~ A*B,contact)
+A.B = lm(Y ~ A + B,contact)
+A = lm(Y ~ A,contact)
+B = lm(Y ~ B,contact)
+N = lm(Y ~ 1, contact)
+all.models = list(AB,A.B,A,B,N)
+SSE = t(as.matrix(sapply(all.models,function(M) sum(M$residuals^2))))
+colnames(SSE) = c("AB","(A+B)","A","B","Empty/Null")
+rownames(SSE) = "SSE"
+anova(A.B, AB)
+results = anova(A.B,AB)
+```
+$H_0$: $(\gamma\delta)_{ij}=0$.  
+$H_A$: some $(\gamma\delta)_{ij}\neq0$.  
+Test-statistics: $F_s=\frac{SSE_s-SSE_L}{d.f(M_s)-d.f(M_L)}/\frac{SSE_L}{d.f(M_L)}=0.2058$  
+p-value for test statistic is 0.6562. We fail to reject $H_0$ and conclude that the interaction between eye contact and gender can be dropped from the model.
+
+**(c)**
+```{r, echo = FALSE}
+anova(B,A.B)
+```
+$H_0$: $\gamma_i=0$  
+$H_A$: some $\gamma_i\neq0$.  
+Test-statistics: $F_s=\frac{SSE_s-SSE_L}{d.f(M_s)-d.f(M_L)}/\frac{SSE_L}{d.f(M_L)}=9.402$  
+p-value is 0.006991. It is small enough for us to reject $H_0$, so we can conclude that the larger model fits better and the factor of eye contact has a significant effect on the rating.
+
+**(d)**
+```{r, echo = FALSE}
+anova(A,A.B)
+```
+$H_0$: $\gamma_i=0$  
+$H_A$: some $\gamma_i\neq0$.  
+Test-statistics: $F_s=\frac{SSE_s-SSE_L}{d.f(M_s)-d.f(M_L)}/\frac{SSE_L}{d.f(M_L)}=13.13$  
+p-value is 0.002098. It is small enough for us to reject $H_0$, so we can conclude that the larger model fits better and the factor of gender has a significant effect on the rating.
+
+### Problem 2
+**(a)**
+```{r, echo = FALSE}
+find.means = function(the.data,fun.name = mean){
+  a = length(unique(the.data[,2]))
+  b = length(unique(the.data[,3]))
+  means.A = by(the.data[,1], the.data[,2], fun.name)
+  means.B = by(the.data[,1],the.data[,3],fun.name)
+  means.AB = by(the.data[,1],list(the.data[,2],the.data[,3]),fun.name)
+  MAB = matrix(means.AB,nrow = b, ncol = a, byrow = TRUE)
+  colnames(MAB) = names(means.A)
+  rownames(MAB) = names(means.B)
+  MA = as.numeric(means.A)
+  names(MA) = names(means.A)
+  MB = as.numeric(means.B)
+  names(MB) = names(means.B)
+  MAB = t(MAB)
+  results = list(A = MA, B = MB, AB = MAB)
+  return(results)
+}
+get.gamma.delta = function(the.model,the.data){
+  nt = nrow(the.data)
+  a = length(unique(the.data[,2]))
+  b = length(unique(the.data[,3]))
+  the.data$hat = the.model$fitted.values
+  the.ns = find.means(the.data,length)
+  a.vals = sort(unique(the.data[,2]))
+  b.vals= sort(unique(the.data[,3]))
+  muij = matrix(nrow = a, ncol = b)
+  rownames(muij) = a.vals
+  colnames(muij) = b.vals
+  for(i in 1:a){
+    for(j in 1:b){
+      muij[i,j] = the.data$hat[which(the.data[,2] == a.vals[i] & the.data[,3] == b.vals[j])[1]]
+    }
+  }
+  mi. = rowMeans(muij)  
+  m.j = colMeans(muij)
+  mu.. = sum(muij)/(a*b)
+  gammai = mi. - mu..
+  deltaj = m.j - mu..
+  gmat = matrix(rep(gammai,b),nrow = a, ncol = b, byrow= FALSE)
+  dmat = matrix(rep(deltaj,a),nrow = a, ncol = b,byrow=TRUE)
+  gamma.deltaij =round(muij -(mu.. + gmat + dmat),8)
+  results = list(Mu.. = mu.., Gam = gammai, Del = deltaj, GamDel = gamma.deltaij)
+  return(results)
+}
+
+A.B.result = get.gamma.delta(A.B, contact)
+A.B.result
+A.B.result$Gam
+A.B.result$Del
+A.B.result$GamDel
+```
+absent and Female appears to have the highest rating.
+
+**(b)**
+```{r, echo = FALSE}
+A.B.result$Gam
+```
+
+**(c)**
+```{r, echo = FALSE}
+A.B.result$Del
+```
+
+**(d)**
+```{r, echo = FALSE}
+A.B.result$GamDel
+```
+
+### Problem 3
+**(a)**
+```{r, echo = FALSE}
+the.data=contact
+nt = nrow(the.data)
+a = length(unique(the.data[,2]))
+b = length(unique(the.data[,3]))
+names(the.data) = c("Y","A","B") # Useful to rename to make coding easier
+
+find.mult = function(alpha,a,b,dfSSE,g,group){
+  if(group == "A"){
+    Tuk = round(qtukey(1-alpha,a,dfSSE)/sqrt(2),3)
+    Bon = round(qt(1-alpha/(2*g), dfSSE ) ,3)
+    Sch = round(sqrt((a-1)*qf(1-alpha, a-1, dfSSE)),3) 
+  }else if(group == "B"){
+    Tuk = round(qtukey(1-alpha,b,dfSSE)/sqrt(2),3)
+    Bon = round(qt(1-alpha/(2*g), dfSSE ) ,3)
+    Sch = round(sqrt((b-1)*qf(1-alpha, b-1, dfSSE)),3) 
+  }else if(group == "AB"){
+    Tuk = round(qtukey(1-alpha,a*b,dfSSE)/sqrt(2),3)
+    Bon = round(qt(1-alpha/(2*g), dfSSE ) ,3)
+    Sch = round(sqrt((a*b-1)*qf(1-alpha, a*b-1, dfSSE)),3) 
+  }
+  results = c(Bon, Tuk,Sch)
+  names(results) = c("Bonferroni","Tukey","Scheffe")
+  return(results)
+}
+
+scary.CI = function(the.data,MSE,multiplier,group,cs){
+   if(sum(cs) != 0 & sum(cs !=0 ) != 1){
+    return("Error - you did not input a valid contrast")
+  }else{
+    the.means = find.means(the.data)
+    the.ns =find.means(the.data,length)
+    nt = nrow(the.data)
+    a = length(unique(the.data[,2]))
+    b = length(unique(the.data[,3]))
+    if(group =="A"){
+        a.means = rowMeans(the.means$AB)
+        est = sum(a.means*cs)
+        mul = rowSums(1/the.ns$AB)
+        SE = sqrt(MSE/b^2 * (sum(cs^2*mul)))
+        N = names(a.means)[cs!=0]
+        CS = paste("(",cs[cs!=0],")",sep = "")
+        fancy = paste(paste(CS,N,sep =""),collapse = "+")
+        names(est) = fancy
+    }else if(group == "B"){
+        b.means = colMeans(the.means$AB)
+        est = sum(b.means*cs)
+        mul = colSums(1/the.ns$AB)
+        SE = sqrt(MSE/a^2 * (sum(cs^2*mul)))
+        N = names(b.means)[cs!=0]
+        CS = paste("(",cs[cs!=0],")",sep = "")
+        fancy = paste(paste(CS,N,sep =""),collapse = "+")
+        names(est) = fancy
+    } else if(group == "AB"){
+      est = sum(cs*the.means$AB)
+      SE = sqrt(MSE*sum(cs^2/the.ns$AB))
+      names(est) = "someAB"
+    }
+    the.CI = est + c(-1,1)*multiplier*SE
+    results = c(est,the.CI)
+    names(results) = c(names(est),"lower bound","upper bound")
+    return(results)
+  }
+}
+
+
+the.means = find.means(the.data)
+the.model = lm(Y~A+B, data = the.data)
+SSE = sum(the.model$residuals^2)
+MSE = SSE/(nt-a-b+1)
+Bon = find.mult(alpha = 0.10, a = 2, b = 2, dfSSE = 20 - (2+2-1), g = 1, group = "A")[1]
+A.cs = c(1,-1)
+the.frame = scary.CI(the.data, MSE, Bon, "A", A.cs)
+the.frame
+```
+
+**(b)**
+```{r, echo = FALSE}
+
+```
+90% CI for factor A is [`r round(the.frame[2], 4)`, `r round(the.frame[3], 4)`]. Both bounds of CI are larger than 0 which suggests a significant factor effect for eye contact.
+
+**(c)**
+```{r, echo = FALSE}
+Bon = find.mult(alpha = 0.10, a = 2, b = 2, dfSSE = 20 - (2+2-1), g = 1, group = "B")[1]
+B.cs = c(1,-1)
+the.frame = scary.CI(the.data, MSE, Bon, "B", B.cs)
+the.frame
+```
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+90% CI for factor B is [`r round(the.frame[2], 4)`,`r round(the.frame[3], 4)`]. Both bounds of CI are larger than 0 which suggests a significant factor effect for gender.
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+AB.cs = matrix(0, nrow = a, ncol = b)
+AB.cs[2,1] = 1
+AB.cs[2,2] = -1
+the.means$AB
+AB.cs
+Bon = find.mult(alpha = 0.01, a = 2, b = 2, dfSSE = 20 - (2+2-1), g = 1, group = "AB")[1]
+the.frame = scary.CI(the.data, MSE, Bon, "AB", AB.cs)
+the.frame
+```
+
+**(f)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+99% CI is [`r round(the.frame[2], 4)`,`r round(the.frame[3], 4)`].  
+We are 99% in confidence that the average rating for females who made eye contact is larger than that for males who made eye contact by between `r round(the.frame[2], 4)` and `r round(the.frame[3], 4)`.
+
+### Problem 4
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+6 brands are randomly selected and are a subset of all possible brands of beer, which might be a random effect.
+
+**(b)**
+```{r, echo = FALSE, warning=FALSE}
+the.data = read.csv("salt.csv")
+names(the.data) = c("Y", "A")
+ran.model = lmer(Y~1+(1|A), data = the.data, REML = FALSE)
+ran.model
+VC = as.data.frame(VarCorr(ran.model))
+VC
+s.e.2 = VC[2, 4]
+s.A.2 = VC[1, 4]
+```
+
+$\sigma_{A} = `r round(sqrt(s.A.2), 4)`$, $\sigma_{A} = `r round(sqrt(s.e.2), 4)`$.
+
+
+**(c)**
+```{r, echo = FALSE, warning=FALSE}
+the.portion = s.A.2/(s.e.2+s.A.2)
+round(the.portion, 4)
+```
+
+$\frac{\sigma^{2}_{A}}{\sigma^{2}_{Y}} = \frac{\sigma^{2}_{A}}{\sigma^{2}_{A}+\sigma^{2}_{e}} = `r round(the.portion, 4)`$.  
+The random effect of Brand explains approxiamately `r round(the.portion*100, 2)`% of the total variance in sodium.
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+null.model = gls(Y~1, data = the.data)
+LL0 = logLik(null.model)
+LLA = logLik(ran.model)
+LL0
+LLA
+p0 = 2
+pA = 3
+p0
+pA
+LR = -2*(LL0 - LLA)
+p.val = pchisq(LR, df = pA-p0, lower.tail = FALSE)
+p.val
+```
+
+$H_{0}$ : $\sigma^{2}_{A} = 0$.  
+$H_{A}$ : $\sigma^{2}_{A} \neq 0$.  
+test-statistic:$LR = -2(LL_{0}-LL_{A})$, dof = $p_{A} - p_{0}$  
+p-value = $\frac{1}{2}P(\chi^{2} > LR) \approx `r round(p.val[1], 4)`$
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+p-value is $`r p.val[1]`$ and it is small enough for us to reject $H_{0}$. We can conclude that $\sigma^{2}_{A} \neq 0$ and the random effect of Brand exists.
+
+### Problem 5
+**(a)**
+```{r, echo = FALSE, warning=FALSE}
+
+```
+
+3 students are randomly selected and are a subset of all students, which might be a random effect.  
+Weekly supplement is ramdomly sampled among weeks in lifetime, which might also be a random effect.
+
+**(b)**
+```{r, echo = FALSE, warning=FALSE}
+the.data = read.csv("sodium.csv")
+names(the.data) = c("Y", "A", "B")
+ran.A.model = lmer(Y~1+B+(1|A), data = the.data, REML = FALSE)
+ran.B.model = lmer(Y~1+A+(1|B), data = the.data, REML = FALSE)
+ran.AB.model.noI = lmer(Y~1+(1|A)+(1|B), data = the.data, REML = FALSE)
+ran.AB.model.I = lmer(Y~1+1+(1|A)+(1|B)+(1|A:B), data = the.data, REML = FALSE)
+ran.model = ran.A.model
+ran.model
+VC = as.data.frame(VarCorr(ran.model))
+VC
+s.e.2 = VC[2, 4]
+s.A.2 = VC[1, 4]
+```
+
+$\sigma^{2}_{e} = `r round(s.e.2, 4)`$, $\sigma^{2}_{A} = `r round(s.A.2, 4)`$.  
+$\sigma^{2}_{Y} = `r round(s.e.2+s.A.2, 4)`$.
+
+**(c)**
+```{r, echo = FALSE, warning=FALSE}
+ran.model = ran.B.model
+ran.model
+VC = as.data.frame(VarCorr(ran.model))
+VC
+s.e.2 = VC[2, 4]
+s.B.2 = VC[1, 4]
+```
+
+$\sigma^{2}_{e} = `r round(s.e.2, 4)`$, $\sigma^{2}_{B} = `r round(s.B.2, 4)`$.  
+$\sigma^{2}_{Y} = `r round(s.e.2+s.B.2, 4)`$.
+
+**(d)**
+```{r, echo = FALSE, warning=FALSE}
+ran.model = ran.AB.model.noI
+ran.model
+VC = as.data.frame(VarCorr(ran.model))
+VC
+s.e.2 = VC[3, 4]
+s.A.2 = VC[2, 4]
+s.B.2 = VC[1, 4]
+```
+
+$\sigma^{2}_{e} = `r round(s.e.2, 4)`$, $\sigma^{2}_{A} = `r round(s.A.2, 4)`$, $\sigma^{2}_{B} = `r round(s.B.2, 4)`$.    
+$\sigma^{2}_{Y} = `r round(s.e.2+s.A.2+s.B.2, 4)`$.
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+test = anova(ran.A.model, ran.AB.model.noI)
+test
+```
+
+Hypothesis:  
+$H_{0}$: The smaller model fits better.  
+$H_{A}$: The larger model fits better.   
+test-statistic:$LR = -2(LL_{0}-LL_{A})$, d.f = 2  
+p-value = $P(\chi^{2} > LR) = 0.01633$.  
+The p-value is small enough for us to reject $H_{0}$. So we can conclude that the smaller model is not statistically better than the larger model.
+
+**(f)**
+```{r, echo = FALSE, warning=FALSE}
+test = anova(ran.B.model, ran.AB.model.noI)
+test
+```
+
+
+$H_{0}$: The smaller model fits better.  
+$H_{A}$: The larger model fits better.     
+test-statistic: $LR = -2(LL_{0}-LL_{A})$, d.f=1
+p-value = $P(\chi^{2} > LR) = 0.01$.  
+The p-value is small enough for us to reject $H_{0}$. So we can conclude that the model in (c) is not statistically better the model in (d).
+
+### R Appendix
+```{r, ref.label=knitr::all_labels(),echo=TRUE,eval=FALSE}
+```

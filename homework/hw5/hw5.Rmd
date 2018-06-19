@@ -161,29 +161,49 @@ The relative probability of being short term birth control vs long term birth co
 
 **(c)**
 ```{r, echo = FALSE}
-model.0 = multinom(con~ age,data = control,trace = FALSE)
-model.a = multinom(con~ age+edu,data = control,trace = FALSE)
-LLA=logLik(model.a)
-LL0=logLik(model.0)
-#pA = length(model.a$coefficients)
-pA = length(coef(model.a))
-#p0 = length(model.0$coefficients)
-p0 = length(coef(model.0))
+GOF.Multi = function(the.model){
+  num.para = the.model$edf
+  n = nrow(the.model$residuals)
+  LL = logLik(the.model)
+  df.model = n - num.para
+  AIC = -2*logLik(the.model) +2*the.model$edf
+  BIC = -2*logLik(the.model) +log(n)*the.model$edf
+  the.results = c(LL,num.para,df.model,AIC,BIC)
+  names(the.results) = c("LL","K","D.F.","AIC","BIC")
+  return(the.results)
+}
+model.list = c("con ~ age","con ~ age + edu")
+model.fits = lapply(model.list,function(the.form){
+  multinom(the.form,data = control,trace = FALSE)
+})
+all.GOF = t(sapply(model.fits,function(models){
+  GOF.Multi(models)
+}))
+rownames(all.GOF) = model.list
+round(all.GOF,digits = 4)
+LL0 = all.GOF[1,"LL"]
+LLA = all.GOF[2,"LL"]
+p0 = all.GOF[1,"K"]
+pA = all.GOF[2,"K"]
 LR = -2*(LL0 - LLA)
-p.value = pchisq(LR, df= pA-p0)
-LR
-p.value
 ```
 
 $H_0$: $\beta_2=\beta_3=\beta_4=0$.  
 $H_A$: At least one $\beta_i\neq0, i=2,3,4$  
-The test statistics LR equals 56.371, p-value equals 1.
+The test statistics LR equals `r round(LR, 4)`, p-value equals 0.
 
 **(d)**
 ```{r, echo = FALSE}
 
 ```
-p-value is large enough for us to fail to reject $H_0$. We can conclude that X2 can be dropped from the model.
+p-value is small enough to reject $H_0$. We can conclude that X2 cannot be dropped from the model.
+
+**(e)**
+```{r, echo = FALSE, warning=FALSE}
+x.star = data.frame(age = 29, edu = "G", working = "Y")
+predict(forward.model, x.star,type = "probs")
+```
+
 
 ### Problem 5
 **(a)**

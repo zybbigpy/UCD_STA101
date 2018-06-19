@@ -1,0 +1,81 @@
+---
+title: "pj2"
+author: "Wangqian Miao"
+date: "2018Äê5ÔÂ26ÈÕ"
+output: html_document
+---
+
+```{r}
+cows =read.csv("cows.csv")
+head(cows)
+ppi = 600
+group.means = by(cows$Weight,cows$Grass,mean)  # First argument is Y, second is grouping column/s
+png("1.png", width=6*ppi, height=4*ppi, res=ppi)
+plot(group.means,xaxt = "n",pch = 19,col = "purple",xlab = "Experiment Group",ylab = "Weight",main = "Average Weight by group",type = "b") #Addinf xaxt = "n" removes the default X axis ticks.
+dev.off()
+
+png("2.png", width=6*ppi, height=4*ppi, res=ppi)
+boxplot(cows$Weight ~ cows$Grass, main = "Weight by group",ylab = "Weight")
+dev.off()
+```
+
+```{r}
+group.means = by(cows$Weight,cows$Grass,mean)
+group.sds = by(cows$Weight,cows$Grass,sd)
+group.nis = by(cows$Weight,cows$Grass,length)
+the.summary = rbind(group.means,group.sds,group.nis)
+the.summary = round(the.summary,digits = 4)
+colnames(the.summary) = names(group.means)
+rownames(the.summary) = c("Means","Std. Dev","Sample Size")
+the.summary
+
+```
+
+
+```{r}
+library(asbio)
+options(scipen = 8)
+larger.model = lm(Weight ~ Grass , data = cows)
+smaller.model = lm(Weight ~1 , data = cows)
+anova.table = anova(smaller.model, larger.model)
+anova.table
+bonfCI(cows$Weight,cows$Grass, conf.level = 0.95)
+bonfCI
+```
+
+```{r}
+n = length(larger.model$residuals) #Counts the number of ei values (which should be n)
+p = length(larger.model$coefficients) #Counts the number of betas
+alpha = 0.01 # You may change this to whatever you like
+t.cutoff = qt(1- alpha/2, n-p)
+ei.s = larger.model$residuals/sqrt(sum(larger.model$residuals^2)/(length(larger.model$residuals) - length(larger.model$coefficients)))
+outliers = which(abs(ei.s) > t.cutoff)
+outliers
+t.cutoff
+```
+
+
+```{r}
+png("3.png", width=6*ppi, height=4*ppi, res=ppi)
+plot(larger.model$residuals,main = "Residual index plot",xlab = "Index",ylab = "residuals",pch = 19, col = "purple")
+dev.off()
+par(mfrow=c(1,2))
+png("4.png", width=6*ppi, height=4*ppi, res=ppi)
+hist(larger.model$residuals,main = "Residual Distribution",xlab = "Residuals")
+dev.off()
+png("5.png", width=6*ppi, height=4*ppi, res=ppi)
+qqnorm(larger.model$residuals)
+qqline(larger.model$residuals)
+dev.off()
+
+shap.test = shapiro.test(larger.model$residuals)
+shap.test$p.value
+ML.test = modlevene.test(larger.model$residuals,cows$Grass)
+ML.test$'Pr(>F)'
+png("6.png", width=6*ppi, height=4*ppi, res=ppi)
+plot(larger.model$fitted.values,larger.model$residuals,pch = 19)
+abline(h= 0 , col = "purple")
+dev.off()
+```
+
+
